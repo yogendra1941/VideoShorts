@@ -367,6 +367,20 @@ def get_history():
     return {"videos": videos}
 
 
+@app.get("/api/projects")
+def get_projects():
+    """Returns active projects list."""
+    project_list = []
+    for jid, job in jobs.items():
+        project_list.append({
+            "job_id": jid,
+            "title": job.get("title", f"Project {jid}"),
+            "status": job.get("status"),
+            "clips_count": len(job.get("clips", [])),
+        })
+    return {"projects": project_list}
+
+
 @app.get("/api/clips/{filename}")
 def stream_clip(filename: str):
     """Serves rendered video file (sanitized to prevent path traversal)."""
