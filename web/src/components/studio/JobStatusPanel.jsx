@@ -29,10 +29,8 @@ export default function JobStatusPanel({
   logs = [],
   logTimes = [],
   processingMedia,
-  syncedTime,
-  isSyncedPlaying,
-  syncTrigger,
-  isCollapsed = false
+  jobError = '',
+  onRetry = null,
 }) {
   const [logsVisible, setLogsVisible] = useState(true);
   const logContainerRef = useRef(null);
@@ -109,6 +107,27 @@ export default function JobStatusPanel({
           })}
         </div>
       </div>
+
+      {/* Error Banner */}
+      {(status === 'error' || jobError) && (
+        <div className="card p-4 border border-rose-500/40 bg-rose-500/10 space-y-2.5 animate-fade">
+          <div className="flex items-center gap-2 text-rose-400 font-semibold text-xs">
+            <AlertCircle size={16} className="shrink-0" />
+            <span>Pipeline Execution Failed</span>
+          </div>
+          <p className="text-xs text-rose-200 font-mono leading-relaxed break-words">
+            {jobError || 'An error occurred during video clipping. Check terminal logs below.'}
+          </p>
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              className="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-medium transition-colors"
+            >
+              Start New Run
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Video Preview Waveform Animation */}
       {processingMedia && (

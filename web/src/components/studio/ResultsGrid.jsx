@@ -105,7 +105,6 @@ export default function ResultsGrid({
                   onEditClip={onEditClip}
                   onReframeClip={onReframeClip}
                   onModeChanged={status === 'processing' ? null : onClipRerendered}
-                  onUpgrade={null}
                 />
                 
                 {/* Custom Quick Action: Social Copy */}

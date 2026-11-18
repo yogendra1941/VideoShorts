@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Film, 
   Youtube, 
@@ -249,6 +249,8 @@ export default function App() {
                   logs={logs}
                   logTimes={logTimes}
                   processingMedia={processingMedia}
+                  jobError={jobError}
+                  onRetry={handleReset}
                 />
               </div>
 

@@ -108,7 +108,9 @@ export default function SubtitleLabView() {
       localStorage.setItem('vs_default_brand', presetId);
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 2000);
-    } catch (_) {}
+    } catch (err) {
+      console.warn('Could not persist default brand preset:', err);
+    }
   };
 
   return (

@@ -46,6 +46,24 @@ export default function StudioSidebar({ activeTab, onSelectTab, status }) {
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
+          
+          // Dynamic status badge for dashboard tab
+          let displayBadge = item.badge;
+          let badgeClass = isActive ? 'bg-accent text-white font-semibold' : 'bg-paper3 text-muted';
+          
+          if (item.id === 'dashboard' && status && status !== 'idle') {
+            if (status === 'processing') {
+              displayBadge = 'Processing';
+              badgeClass = 'bg-amber-500/20 text-amber-400 font-semibold border border-amber-500/30 animate-pulse';
+            } else if (status === 'complete') {
+              displayBadge = 'Ready';
+              badgeClass = 'bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/30';
+            } else if (status === 'error') {
+              displayBadge = 'Failed';
+              badgeClass = 'bg-rose-500/20 text-rose-400 font-semibold border border-rose-500/30';
+            }
+          }
+
           return (
             <button
               key={item.id}
@@ -65,11 +83,9 @@ export default function StudioSidebar({ activeTab, onSelectTab, status }) {
                 />
                 <span className="capitalize">{item.label}</span>
               </div>
-              {item.badge && (
-                <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
-                  isActive ? 'bg-accent text-white font-semibold' : 'bg-paper3 text-muted'
-                }`}>
-                  {item.badge}
+              {displayBadge && (
+                <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${badgeClass}`}>
+                  {displayBadge}
                 </span>
               )}
             </button>
