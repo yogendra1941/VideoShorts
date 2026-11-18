@@ -4,7 +4,6 @@ import './index.css'
 import { AuthProvider } from './contexts/AuthContext'
 import { capture as captureAttribution } from './lib/attribution'
 import { applyConsent } from './lib/consent'
-import CookieBanner from './components/CookieBanner'
 
 // VideoShorts is a 100% free studio app: the root view is the studio itself,
 // no marketing landing, no pricing, no sign-in walls.
@@ -63,7 +62,6 @@ createRoot(document.getElementById('root')).render(
       <Suspense fallback={<div className="min-h-screen bg-paper flex items-center justify-center text-muted text-sm lowercase">loading…</div>}>
         <Root />
       </Suspense>
-      <CookieBanner />
     </AuthProvider>
   </StrictMode>,
 )

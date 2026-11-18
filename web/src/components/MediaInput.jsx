@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link2, Upload, FileVideo, X, Info, Loader2, ChevronDown } from 'lucide-react';
 import { track } from '../lib/analytics';
 import { getApiUrl } from '../config';
-import SourceCost from './SourceCost';
+import { Sparkles, Type, ShieldCheck, Zap } from 'lucide-react';
 
 const SUPPORTED_PLATFORMS = [
     'YouTube', 'Vimeo', 'TikTok', 'X / Twitter', 'Twitch', 'Kick',
@@ -49,6 +49,11 @@ export default function MediaInput({ onProcess, isProcessing }) {
     const [targetClips, setTargetClips] = useState('');
     const [clipMinSeconds, setClipMinSeconds] = useState('');
     const [clipMaxSeconds, setClipMaxSeconds] = useState('');
+    const [brand, setBrand] = useState(() => {
+        try { return localStorage.getItem('vs_default_brand') || 'cyber_neon'; } catch { return 'cyber_neon'; }
+    });
+    const [enableHonesty, setEnableHonesty] = useState(true);
+    const [enableDeepClips, setEnableDeepClips] = useState(true);
     // Auto-hook: burn the AI hook text into every clip. On by default; the
     // choice persists so turning it off sticks across sessions.
     const [autoHook, setAutoHook] = useState(() => {
@@ -124,6 +129,9 @@ export default function MediaInput({ onProcess, isProcessing }) {
             targetClips: targetClips || null,
             clipMinSeconds: clipMinSeconds || null,
             clipMaxSeconds: clipMaxSeconds || null,
+            brand,
+            enableHonesty,
+            enableDeepClips,
             autoHook,
             autoHookStyle,
             layout,
@@ -131,6 +139,7 @@ export default function MediaInput({ onProcess, isProcessing }) {
             sourceEnd: range ? Math.round(range.end) : null,
         };
         try {
+            localStorage.setItem('vs_default_brand', brand);
             localStorage.setItem('os_auto_hook', autoHook ? '1' : '0');
             localStorage.setItem('os_auto_hook_style_v2', autoHookStyle);
             localStorage.setItem('os_layout', layout);
@@ -259,13 +268,43 @@ export default function MediaInput({ onProcess, isProcessing }) {
                     </div>
                 )}
 
-                <SourceCost
-                    mode={mode}
-                    url={url}
-                    fileSeconds={fileSeconds}
-                    range={range}
-                    onRangeChange={setRange}
-                />
+                {/* Subtitle Style Preset Picker */}
+                <div className="mt-5">
+                    <p className="eyebrow mb-2 flex items-center justify-between">
+                        <span>Karaoke Subtitle Preset</span>
+                        <span className="text-[10px] text-accent font-mono">6 Styles Available</span>
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {[
+                            { id: 'cyber_neon', label: 'Cyber Neon', color: '#06B6D4' },
+                            { id: 'hormozi_gold', label: 'Hormozi Gold', color: '#FFE600' },
+                            { id: 'podcast_split', label: 'Podcast Split', color: '#6366F1' },
+                            { id: 'bold', label: 'Bold Impact', color: '#EF4444' },
+                            { id: 'minimal', label: 'Minimal Clean', color: '#FFFFFF' },
+                            { id: 'default', label: 'Default Studio', color: '#38BDF8' },
+                        ].map((b) => {
+                            const isSelected = brand === b.id;
+                            return (
+                                <button
+                                    key={b.id}
+                                    type="button"
+                                    onClick={() => setBrand(b.id)}
+                                    className={`py-2 px-2.5 rounded-lg border text-left flex items-center justify-between transition-all ${
+                                        isSelected 
+                                            ? 'border-accent bg-accent/15 text-ink shadow-sm' 
+                                            : 'border-rule bg-paper3/30 text-muted hover:border-rule2 hover:text-ink'
+                                    }`}
+                                >
+                                    <span className="text-xs font-medium truncate">{b.label}</span>
+                                    <span 
+                                        className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/40" 
+                                        style={{ backgroundColor: b.color }} 
+                                    />
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
 
                 {/* Output format selector */}
                 <div className="mt-5" data-tutorial="output-format">
@@ -400,6 +439,28 @@ export default function MediaInput({ onProcess, isProcessing }) {
                                     </p>
                                 )}
                             </div>
+                            <div className="col-span-1 sm:col-span-3 flex flex-wrap items-center justify-between gap-3 pt-3 sm:pt-1 border-t border-rule">
+                                <label className="flex items-center gap-2 text-xs text-ink2 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={enableHonesty}
+                                        onChange={(e) => setEnableHonesty(e.target.checked)}
+                                        className="w-4 h-4 shrink-0 accent-[var(--color-accent)] cursor-pointer"
+                                    />
+                                    Honesty Gate (Transcript fact-check & hallucination filter)
+                                </label>
+                            </div>
+                            <div className="col-span-1 sm:col-span-3 flex flex-wrap items-center justify-between gap-3 pt-3 sm:pt-1 border-t border-rule">
+                                <label className="flex items-center gap-2 text-xs text-ink2 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={enableDeepClips}
+                                        onChange={(e) => setEnableDeepClips(e.target.checked)}
+                                        className="w-4 h-4 shrink-0 accent-[var(--color-accent)] cursor-pointer"
+                                    />
+                                    AI Deep Clips (Topic thread composition across scenes)
+                                </label>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -412,7 +473,7 @@ export default function MediaInput({ onProcess, isProcessing }) {
                         className="mt-0.5 w-4 h-4 shrink-0 accent-[var(--color-accent)] cursor-pointer"
                     />
                     <span>
-                        I confirm I own this content or have the rights to process it. I am responsible for any content I submit. See our <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-ink2 underline underline-offset-2 hover:text-brass transition-colors" onClick={(e) => e.stopPropagation()}>Terms</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-ink2 underline underline-offset-2 hover:text-brass transition-colors" onClick={(e) => e.stopPropagation()}>Privacy Policy</a>.
+                        I confirm I have the rights to process this video. Ready for 100% free AI shorts generation.
                     </span>
                 </label>
 
