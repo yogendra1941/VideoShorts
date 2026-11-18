@@ -21,6 +21,7 @@ from core.layout_picker import LayoutPicker
 from core.reframer import SmartReframer
 from core.subtitles import SubtitleGenerator
 from core.renderer import VideoRenderer
+from core.audio_ducking import AudioDucker
 
 # Configure logging
 logging.basicConfig(
@@ -49,6 +50,7 @@ class VideoShortsPipeline:
         self.reframer = SmartReframer()
         self.sub_gen = SubtitleGenerator(preset=self.brand_kit.get_preset())
         self.renderer = VideoRenderer()
+        self.audio_ducker = AudioDucker()
 
     def run(
         self,
@@ -58,6 +60,8 @@ class VideoShortsPipeline:
         enable_critic: bool = True,
         enable_honesty: bool = True,
         force_layout: Optional[str] = None,
+        music_path: Optional[Path] = None,
+        music_volume: float = 0.18,
     ) -> List[Path]:
         """Executes the full clipping workflow and exports finished 9:16 shorts."""
         logger.info("=== Starting VideoShorts Pipeline ===")
@@ -169,6 +173,20 @@ class VideoShortsPipeline:
                 crop_box=crop_box,
                 output_filename=f"short_{idx:02d}_{clip.get('title', 'clip').replace(' ', '_')[:25]}.mp4",
             )
+
+            # Optional sidechain compression audio ducking
+            if music_path and Path(music_path).exists():
+                logger.info("Applying dynamic sidechain audio ducking with background track: %s", music_path)
+                ducked_clip = out_clip.with_name(f"ducked_{out_clip.name}")
+                self.audio_ducker.mix_background_music(
+                    video_path=out_clip,
+                    music_path=Path(music_path),
+                    output_path=ducked_clip,
+                    music_volume=music_volume,
+                )
+                if ducked_clip.exists():
+                    ducked_clip.replace(out_clip)
+
             rendered_outputs.append(out_clip)
 
             # Write per-clip JSON metadata (hook, social copy, timings) alongside the MP4
@@ -206,6 +224,8 @@ def main():
     parser.add_argument("--no-honesty", action="store_true", help="Skip deep-clip honesty gate")
     parser.add_argument("--brand", choices=BrandKit.available_presets(), default="default", help="Brand/preset style")
     parser.add_argument("--layout", choices=["TRACK", "SPLIT", "GENERAL", "SCREENCAST"], help="Force specific 9:16 layout")
+    parser.add_argument("--music", help="Path to background music audio file for automatic ducking")
+    parser.add_argument("--music-volume", type=float, default=0.18, help="Background music base volume (0.0 to 1.0, default: 0.18)")
 
     args = parser.parse_args()
     pipeline = VideoShortsPipeline(brand_preset=args.brand)
@@ -216,6 +236,8 @@ def main():
         enable_critic=not args.no_critic,
         enable_honesty=not args.no_honesty,
         force_layout=args.layout,
+        music_path=Path(args.music) if args.music else None,
+        music_volume=args.music_volume,
     )
 
 

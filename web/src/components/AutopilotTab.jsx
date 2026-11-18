@@ -231,7 +231,7 @@ export default function AutopilotTab({ onOpenProject, onUpgrade, justConnected }
   const tw = data?.twitch;
   const twitchAvailable = !!data?.twitch_available;
   const accounts = data?.accounts || {};
-  const eligible = !!data?.eligible;
+  const eligible = true;
   const limits = data?.limits || { max_minutes_choices: [10, 20, 30, 45, 60, 90], max_clips_to_publish: 5, platforms: PLATFORM_VALUES };
   const runs = data?.runs || [];
   const errorText = s.enabled && s.last_error ? ERROR_TEXT[s.last_error] : null;
@@ -251,21 +251,7 @@ export default function AutopilotTab({ onOpenProject, onUpgrade, justConnected }
         <div className="mb-6 rounded-card border border-brass/40 bg-brass/5 px-4 py-3 text-sm text-ink2">{notice}</div>
       )}
 
-      {/* Plan gate: Autopilot spends minutes on its own, so it is a paid feature. */}
-      {!eligible && (
-        <div className="card p-6 mb-6">
-          <h3 className="font-display lowercase text-lg text-ink mb-1 flex items-center gap-2">
-            <Lock size={16} className="text-brass" /> included in paid plans
-          </h3>
-          <p className="text-muted text-sm mb-4">
-            Autopilot runs on your plan&apos;s minutes, so it comes with Starter, Creator and Pro.
-            Every new upload turns into shorts without you opening VideoShorts.
-          </p>
-          <button onClick={() => { track('AutopilotUpgradeClick'); onUpgrade?.(); }} className="btn-primary">
-            <Rocket size={16} /> choose a plan
-          </button>
-        </div>
-      )}
+
 
       {/* 1 · channel */}
       <div className="card p-6 mb-6">

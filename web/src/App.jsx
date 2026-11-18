@@ -18,6 +18,8 @@ import SettingsView from './components/studio/SettingsView';
 import AiAgentView from './components/studio/AiAgentView';
 import MediaInput from './components/MediaInput';
 import HistoryTab from './components/HistoryTab';
+import ThumbnailStudio from './components/ThumbnailStudio';
+import AutopilotTab from './components/AutopilotTab';
 import ClipEditor from './components/ClipEditor';
 import ReframeEditor from './components/ReframeEditor';
 import ScheduleWeekModal from './components/ScheduleWeekModal';
@@ -275,6 +277,31 @@ export default function App() {
           {/* TAB: SUBTITLE LAB */}
           {activeTab === 'subtitles' && (
             <SubtitleLabView />
+          )}
+
+          {/* TAB: THUMBNAIL STUDIO */}
+          {activeTab === 'thumbnails' && (
+            <div className="h-full overflow-y-auto custom-scrollbar p-6 max-w-6xl mx-auto">
+              <ThumbnailStudio
+                managed={true}
+                onCreateClips={() => {
+                  setActiveTab('dashboard');
+                }}
+              />
+            </div>
+          )}
+
+          {/* TAB: CHANNEL AUTOPILOT */}
+          {activeTab === 'autopilot' && (
+            <div className="h-full overflow-y-auto custom-scrollbar p-6 max-w-5xl mx-auto">
+              <AutopilotTab
+                onOpenProject={(id) => {
+                  setJobId(id);
+                  setStatus('processing');
+                  setActiveTab('dashboard');
+                }}
+              />
+            </div>
           )}
 
           {/* TAB: CLIP VAULT (HISTORY) */}

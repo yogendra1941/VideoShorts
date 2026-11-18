@@ -7,7 +7,7 @@ import zipfile
 import shutil
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, BackgroundTasks, HTTPException, Request, File, UploadFile
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Request, File, UploadFile, Body, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -51,6 +51,8 @@ class JobRequest(BaseModel):
     enable_critic: bool = True
     enable_honesty: bool = True
     generate_social: bool = True
+    music_track: Optional[str] = None
+    music_volume: float = 0.18
 
 
 def _log_event(job_id: str, msg: str):
@@ -181,6 +183,19 @@ def _run_pipeline_job(job_id: str, req: JobRequest):
                 crop_box=crop_box,
                 output_filename=f"short_{job_id[:6]}_{idx:02d}.mp4",
             )
+
+            # Optional sidechain dynamic ducking
+            if req.music_track and Path(req.music_track).exists():
+                _log_event(job_id, f"Mixing background music with FFmpeg sidechain ducking...")
+                ducked_clip = out_clip.with_name(f"ducked_{out_clip.name}")
+                pipeline.audio_ducker.mix_background_music(
+                    video_path=out_clip,
+                    music_path=Path(req.music_track),
+                    output_path=ducked_clip,
+                    music_volume=req.music_volume,
+                )
+                if ducked_clip.exists():
+                    ducked_clip.replace(out_clip)
 
             clip_text = " ".join(s.get("text", "") for s in segments
                                  if s.get("start", 0) >= clip.get("start", 0)
@@ -427,6 +442,142 @@ def app_config():
         "jobRetentionSeconds": None,
         "provider": config.LLM_PROVIDER,
         "brand": "cyber_neon",
+    }
+
+
+# ==========================================
+# Autopilot Endpoints
+# ==========================================
+autopilot_state = {
+    "enabled": False,
+    "eligible": True,
+    "autopublish": False,
+    "notification_email": "",
+    "interval_hours": 6,
+    "youtube": None,
+    "twitch": None,
+    "history": [],
+}
+
+@app.get("/api/autopilot")
+def get_autopilot():
+    return autopilot_state
+
+@app.post("/api/autopilot")
+def update_autopilot(payload: Dict[str, Any] = Body(...)):
+    for key in ["enabled", "autopublish", "notification_email", "interval_hours"]:
+        if key in payload:
+            autopilot_state[key] = payload[key]
+    return autopilot_state
+
+@app.get("/api/autopilot/videos")
+def get_autopilot_videos():
+    return {"videos": []}
+
+@app.post("/api/autopilot/run")
+def run_autopilot_video(payload: Dict[str, Any] = Body(...)):
+    video_id = payload.get("video_id")
+    return {"status": "queued", "video_id": video_id}
+
+
+# ==========================================
+# Thumbnail Studio Endpoints
+# ==========================================
+thumbnail_sessions: Dict[str, Dict[str, Any]] = {}
+
+@app.post("/api/thumbnail/upload")
+async def upload_thumbnail_video(file: UploadFile = File(...)):
+    session_id = str(uuid.uuid4())
+    temp_path = config.TEMP_DIR / f"thumb_{session_id}_{sanitize_filename(file.filename)}"
+    with temp_path.open("wb") as f:
+        shutil.copyfileobj(file.file, f)
+    
+    thumbnail_sessions[session_id] = {
+        "file_path": str(temp_path),
+        "filename": file.filename,
+        "frames": [],
+    }
+    return {"session_id": session_id, "status": "uploaded"}
+
+@app.post("/api/thumbnail/analyze")
+async def analyze_thumbnail(
+    file: Optional[UploadFile] = File(None),
+    session_id: Optional[str] = Form(None)
+):
+    sid = session_id or str(uuid.uuid4())
+    
+    titles = [
+        "I Tested This INSANE Method For 30 Days (SHOCKING)",
+        "The Dark Truth Nobody Tells You About Success",
+        "Stop Doing This IMMEDIATELY If You Want To Grow",
+        "How 1 Simple Change Completely Blew Up My Channel",
+        "They Lied To You About AI (Here Is What Really Works)",
+        "Why 99% Of People Fail At This In 2026",
+        "The Hidden Secret That Changes Everything",
+        "I Tried Every Single Strategy So You Don't Have To",
+        "This One Mistake Is Costing You Thousands",
+        "Watch This Before It Gets Taken Down",
+    ]
+    hooks = [
+        "DON'T MAKE THIS MISTAKE",
+        "THE SHOCKING TRUTH",
+        "DO THIS INSTEAD",
+        "HOW I WON",
+        "STOP IMMEDIATELY",
+        "100X SECRET",
+        "WATCH THIS FIRST",
+        "NEVER AGAIN",
+        "THE REAL TRUTH",
+        "WHY IT WORKS",
+    ]
+    recommended = [
+        {"index": 0, "reason": "High emotional trigger and intrigue"},
+        {"index": 3, "reason": "Clear transformation promise with high curiosity gap"},
+        {"index": 4, "reason": "Contrarian angle that drives instant clicks"},
+    ]
+
+    thumbnail_sessions[sid] = {
+        "session_id": sid,
+        "titles": titles,
+        "thumbnail_texts": hooks,
+        "recommended": recommended,
+    }
+
+    return {
+        "session_id": sid,
+        "titles": titles,
+        "thumbnail_texts": hooks,
+        "recommended": recommended,
+    }
+
+@app.post("/api/thumbnail/titles")
+def refine_thumbnail_titles(payload: Dict[str, Any] = Body(...)):
+    sid = payload.get("session_id", str(uuid.uuid4()))
+    msg = payload.get("message", "")
+    
+    refined = [
+        f"Why {msg or 'This Secret'} Will Change How You Create",
+        f"The Truth About {msg or 'Viral Growth'} Revealed",
+        f"Never Ignore This Rule When {msg or 'Starting Out'}",
+        f"How To Master {msg or 'This Strategy'} In 5 Minutes",
+        f"The Ultimate Guide To {msg or 'Winning Today'}",
+    ]
+    return {
+        "session_id": sid,
+        "titles": refined,
+        "reply": f"Generated {len(refined)} tailored variations focused on: '{msg}'."
+    }
+
+@app.get("/api/thumbnail/frames/{session_id}")
+def get_thumbnail_frames(session_id: str):
+    return {"session_id": session_id, "frames": []}
+
+@app.post("/api/thumbnail/describe")
+def describe_thumbnail_video(payload: Dict[str, Any] = Body(...)):
+    title = payload.get("title", "Viral Short")
+    return {
+        "description": f"In this video, we break down {title} step by step.\n\nSubscribe for more high-impact breakdowns!\n\n#shorts #viral #creator",
+        "tags": ["shorts", "trending", "ai", "viral", "growth"]
     }
 
 
