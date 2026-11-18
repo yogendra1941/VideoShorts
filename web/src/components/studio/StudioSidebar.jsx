@@ -9,7 +9,6 @@ import {
   Github, 
   CheckCircle2, 
   ExternalLink,
-  Flame,
   Layers,
   Image as ImageIcon,
   Radio
@@ -30,8 +29,8 @@ export default function StudioSidebar({ activeTab, onSelectTab, status }) {
     <aside className="w-64 border-r border-rule bg-paper2/80 backdrop-blur-md flex flex-col shrink-0 h-full select-none">
       {/* Brand Header */}
       <div className="h-16 border-b border-rule flex items-center px-5 gap-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-accent to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-accent/20">
-          <Flame size={20} className="fill-white/20" />
+        <div className="w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-indigo-500/20 ring-1 ring-white/15 shrink-0 flex items-center justify-center bg-[#0b0f19] transition-transform group-hover:scale-105">
+          <img src="/favicon.svg" alt="VideoShorts" className="w-full h-full object-contain" />
         </div>
         <div>
           <div className="font-display font-bold text-base tracking-wide text-ink flex items-center gap-1.5">
