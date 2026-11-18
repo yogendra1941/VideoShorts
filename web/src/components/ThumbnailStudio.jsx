@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, Image, Loader2, Send, Check, Download, ArrowRight, ArrowLeft, Sparkles, Video, Type, X, Plus, MessageSquare, FileText, Youtube, AlertCircle, Settings } from 'lucide-react';
+import { Upload, Image, Loader2, Send, Check, Download, ArrowRight, ArrowLeft, RefreshCw, Zap, Video, Type, X, Plus, MessageSquare, FileText, Youtube, AlertCircle, Settings } from 'lucide-react';
 import { getApiUrl } from '../config';
 import { apiFetch, QuotaError, openQuotaWall } from '../lib/api';
 import StepIndicator from './ui/StepIndicator';
@@ -560,7 +560,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                   </>
                 ) : (
                   <>
-                    <Sparkles size={16} className="hidden sm:block" />
+                    <Zap size={16} className="hidden sm:block" />
                     <span className="whitespace-nowrap">Analyze & Get Titles</span>
                   </>
                 )}
@@ -864,7 +864,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                   </>
                 ) : (
                   <>
-                    <Sparkles size={16} />
+                    <Image size={16} />
                     Generate Thumbnails
                   </>
                 )}
@@ -953,7 +953,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                       </>
                     ) : (
                       <>
-                        <Sparkles size={14} />
+                        <RefreshCw size={14} />
                         Regenerate
                       </>
                     )}
@@ -1032,7 +1032,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                 <div className="glass-panel p-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="eyebrow flex items-center gap-2">
-                      <Sparkles size={14} className="text-brass" />
+                      <FileText size={14} className="text-brass" />
                       AI DESCRIPTION
                     </p>
                     <span className="readout">WITH CHAPTERS</span>

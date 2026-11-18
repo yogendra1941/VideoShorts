@@ -3,9 +3,8 @@ import {
   Download, 
   Calendar, 
   Loader2, 
-  Sparkles, 
   Share2, 
-  CheckCircle2,
+  CheckCircle2, 
   Film,
   Zap,
   SlidersHorizontal
@@ -89,7 +88,7 @@ export default function ResultsGrid({
       <div className="flex-1 overflow-y-auto custom-scrollbar p-1">
         {clips.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-rule rounded-2xl">
-            <Sparkles size={32} className="text-muted/40 mb-3" />
+            <Film size={32} className="text-muted/40 mb-3" />
             <p className="text-sm text-ink font-medium">No clips rendered yet</p>
             <p className="text-xs text-muted max-w-sm mt-1">
               Submit a video or URL on the left to extract viral vertical shorts.

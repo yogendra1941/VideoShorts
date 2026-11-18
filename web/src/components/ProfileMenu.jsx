@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { CreditCard, LogOut, Sparkles } from 'lucide-react';
+import { CreditCard, LogOut, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 // Header avatar + dropdown for signed-in cloud users: shows the email and gives
@@ -42,7 +42,7 @@ export default function ProfileMenu({ onUpgrade = null }) {
               onClick={() => { setOpen(false); window.location.hash = '#/pricing'; }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm lowercase text-brass hover:bg-paper3 transition-colors"
             >
-              <Sparkles size={16} /> Start free
+              <Zap size={16} /> Start free
             </button>
           )}
           {isManaged && plan === 'free' && (
@@ -54,7 +54,7 @@ export default function ProfileMenu({ onUpgrade = null }) {
               }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm lowercase text-brass hover:bg-paper3 transition-colors"
             >
-              <Sparkles size={16} /> Upgrade · no watermark
+              <Zap size={16} /> Upgrade · no watermark
             </button>
           )}
           <button

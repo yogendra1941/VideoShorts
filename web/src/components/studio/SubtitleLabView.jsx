@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Type, 
-  Sparkles, 
   Play, 
   Pause, 
   RotateCcw, 

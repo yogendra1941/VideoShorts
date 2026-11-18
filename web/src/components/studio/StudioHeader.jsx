@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  Sparkles, 
   RotateCcw, 
   Plus, 
   CheckCircle2, 

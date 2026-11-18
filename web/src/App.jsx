@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
-  Sparkles, 
+  Film, 
   Youtube, 
   Instagram, 
   AlertTriangle, 
   CheckCircle2, 
   Loader2, 
-  Download,
-  Film
+  Download
 } from 'lucide-react';
 
 import StudioSidebar from './components/studio/StudioSidebar';
@@ -214,7 +213,7 @@ export default function App() {
               <div className="max-w-xl w-full text-center space-y-6">
                 <div className="space-y-3">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent font-mono text-xs uppercase">
-                    <Sparkles size={13} /> Next-Gen AI Video Repurposing
+                    <Film size={13} /> High-Precision Video Repurposing
                   </div>
                   <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-ink font-display">
                     Transform Long Videos into Viral Shorts

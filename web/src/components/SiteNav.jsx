@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Cpu, Film, Github, ExternalLink } from 'lucide-react';
+import { Zap, Cpu, Film, Github, ExternalLink } from 'lucide-react';
 
 export default function SiteNav({ className = '' }) {
   return (
@@ -35,7 +35,7 @@ export default function SiteNav({ className = '' }) {
 
           {/* AI Model Status */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-950/40 border border-indigo-800/40 text-xs text-indigo-300">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <Zap className="w-3.5 h-3.5 text-indigo-400" />
             <span className="font-medium text-[11px]">Inception Mercury-3</span>
           </div>
         </div>

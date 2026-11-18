@@ -8,7 +8,6 @@ import {
   Copy, 
   Check, 
   Terminal, 
-  Sparkles,
   Zap,
   ArrowRight,
   FolderSync

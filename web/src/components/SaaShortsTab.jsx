@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Globe, Sparkles, Download, Copy, Check, ChevronRight, ChevronLeft, Loader2, AlertCircle, Volume2, User, Film, Terminal, ChevronDown, RefreshCw, Share2, Calendar, Upload } from 'lucide-react';
+import { Globe, Zap, Download, Copy, Check, ChevronRight, ChevronLeft, Loader2, AlertCircle, Volume2, User, Film, Terminal, ChevronDown, RefreshCw, Share2, Calendar, Upload } from 'lucide-react';
 import { getApiUrl } from '../config';
 import { apiFetch } from '../lib/api';
 import { SOCIAL_PLATFORMS, defaultPlatformFlags, flagsFromList } from '../lib/socialPlatforms';
@@ -550,7 +550,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                   </>
                 ) : (
                   <>
-                    <Sparkles size={16} className="hidden sm:block" />
+                    <Zap size={16} className="hidden sm:block" />
                     {url.trim() ? 'research & generate scripts' : 'generate scripts'}
                   </>
                 )}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  Sparkles, 
+  Film, 
   Type, 
   History, 
   Bot, 
@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Clips Studio', icon: Sparkles, badge: 'AI' },
+  { id: 'dashboard', label: 'Clips Studio', icon: Film, badge: 'Studio' },
   { id: 'subtitles', label: 'Subtitle Lab', icon: Type, badge: '6 Styles' },
   { id: 'history', label: 'Clip Vault', icon: History },
   { id: 'agent', label: 'Autonomous Agent', icon: Bot, badge: 'New' },

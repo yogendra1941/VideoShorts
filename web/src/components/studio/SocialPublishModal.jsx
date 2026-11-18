@@ -6,7 +6,7 @@ import {
   Share2, 
   Youtube, 
   Instagram, 
-  Sparkles,
+  Flame,
   Hash,
   MessageSquare
 } from 'lucide-react';
@@ -93,7 +93,7 @@ export default function SocialPublishModal({ isOpen, onClose, clip, index }) {
           {currentData.title && (
             <div className="space-y-1.5">
               <label className="text-[11px] font-mono uppercase tracking-wider text-muted flex items-center gap-1.5">
-                <Sparkles size={12} className="text-accent" /> Recommended Hook Title
+                <Flame size={12} className="text-accent" /> Recommended Hook Title
               </label>
               <div className="p-3 rounded-lg bg-paper border border-rule text-sm font-medium text-ink">
                 {currentData.title}

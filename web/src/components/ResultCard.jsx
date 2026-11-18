@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Share2, AlertCircle, Loader2, Copy, Check, Wand2, Type, Calendar, Languages, FileText, Link2, Scissors, Crosshair, TrendingUp, Sparkles } from 'lucide-react';
+import { Download, Share2, AlertCircle, Loader2, Copy, Check, Sliders, Type, Calendar, Languages, FileText, Link2, Scissors, Crosshair, TrendingUp, Zap, Flame } from 'lucide-react';
 import { getApiUrl } from '../config';
 import { apiFetch } from '../lib/api';
 import { platformOptions as buildPlatformOptions, defaultPlatformFlags, flagsFromList } from '../lib/socialPlatforms';
@@ -997,7 +997,7 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
                     >
                         {isSwitchingMode
                             ? <Loader2 size={20} className="animate-spin text-brass shrink-0" />
-                            : <Sparkles size={20} className="text-brass shrink-0" />}
+                            : <Flame size={20} className="text-brass shrink-0" />}
                         <span className="min-w-0">
                             <span className="block text-sm font-semibold text-ink">
                                 {isSwitchingMode ? 'Rendering pro mode…' : 'Try pro mode on this clip'}
@@ -1049,7 +1049,7 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
                         >
                             {isSwitchingMode
                                 ? <Loader2 size={16} className={`animate-spin shrink-0 ${!isPro && clip.pro_suggested ? '' : 'text-brass'}`} />
-                                : <Sparkles size={16} className={!isPro && clip.pro_suggested ? 'shrink-0' : `${isPro ? 'text-brass' : 'text-muted'} group-hover:text-brass transition-colors shrink-0`} />}
+                                : <Flame size={16} className={!isPro && clip.pro_suggested ? 'shrink-0' : `${isPro ? 'text-brass' : 'text-muted'} group-hover:text-brass transition-colors shrink-0`} />}
                             {isSwitchingMode ? 'rendering…' : isPro ? 'normal mode' : 'pro mode'}
                         </button>
                     )}
@@ -1059,7 +1059,7 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
                         disabled={isEditing}
                         className={QUIET_BTN}
                     >
-                        {isEditing ? <Loader2 size={16} className="animate-spin text-brass shrink-0" /> : <Wand2 size={16} className="text-muted group-hover:text-brass transition-colors shrink-0" />}
+                        {isEditing ? <Loader2 size={16} className="animate-spin text-brass shrink-0" /> : <Sliders size={16} className="text-muted group-hover:text-brass transition-colors shrink-0" />}
                         {isEditing ? 'editing…' : 'auto edit'}
                     </button>
 
@@ -1077,7 +1077,7 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
                         disabled={isHooking}
                         className={QUIET_BTN}
                     >
-                        {isHooking ? <Loader2 size={16} className="animate-spin text-brass shrink-0" /> : <Wand2 size={16} className="text-muted group-hover:text-brass transition-colors shrink-0" />}
+                        {isHooking ? <Loader2 size={16} className="animate-spin text-brass shrink-0" /> : <Flame size={16} className="text-muted group-hover:text-brass transition-colors shrink-0" />}
                         {isHooking ? 'saving…' : 'edit hook'}
                     </button>
 

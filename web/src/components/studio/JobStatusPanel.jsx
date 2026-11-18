@@ -7,9 +7,9 @@ import {
   CheckCircle2, 
   AlertCircle,
   Film,
-  Sparkles,
+  TrendingUp,
   Scissors,
-  Wand2,
+  Crosshair,
   Subtitles,
   Cpu
 } from 'lucide-react';
@@ -18,9 +18,9 @@ import ProcessingAnimation from '../ProcessingAnimation';
 const PIPELINE_STAGES = [
   { id: 'ingest', label: 'Ingest & Audio', icon: Film },
   { id: 'whisper', label: 'Faster-Whisper ASR', icon: Activity },
-  { id: 'scoring', label: 'Virality Scoring', icon: Sparkles },
+  { id: 'scoring', label: 'Virality Scoring', icon: TrendingUp },
   { id: 'honesty', label: 'Honesty Gate', icon: Scissors },
-  { id: 'reframe', label: 'Face Tracking', icon: Wand2 },
+  { id: 'reframe', label: 'Face Tracking', icon: Crosshair },
   { id: 'render', label: 'NVENC Render', icon: Subtitles },
 ];
 
