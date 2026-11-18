@@ -1,0 +1,19 @@
+# Virtual environment
+venv/
+.env
+
+# Temporary and render artifacts
+temp/
+output/
+*.mp4
+*.wav
+*.ass
+*.jpg
+*.png
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+.DS_Store
