@@ -12,21 +12,12 @@ import UGCGallery from './components/UGCGallery';
 import ScheduleWeekModal from './components/ScheduleWeekModal';
 import ClipEditor from './components/ClipEditor';
 import ReframeEditor from './components/ReframeEditor';
-import UsageMeter from './components/UsageMeter';
-import TopUpModal from './components/TopUpModal';
-import WatermarkModal, { watermarkNoticeDismissed } from './components/WatermarkModal';
 import { getApiUrl } from './config';
 import StarBanner from './components/StarBanner';
-import PlanChoiceModal from './components/PlanChoiceModal';
 import ClipTutorial from './components/ClipTutorial';
 import OnboardingSurvey from './components/OnboardingSurvey';
-import TrialUpgradeModal from './components/TrialUpgradeModal';
 import LoginModal from './components/LoginModal';
-import TrialGate from './components/TrialGate';
-import AdvancedBanner from './components/AdvancedBanner';
 import HistoryTab from './components/HistoryTab';
-import AutopilotTab from './components/AutopilotTab';
-import ProfileMenu from './components/ProfileMenu';
 import Modal from './components/ui/Modal';
 import { useAuth } from './contexts/AuthContext';
 import { apiFetch, apiJson, QuotaError, QUOTA_WALL_EVENT } from './lib/api';
@@ -511,19 +502,7 @@ function App() {
     return () => window.removeEventListener(QUOTA_WALL_EVENT, onWall);
   }, [isManaged, meStatus, refreshMe]);
 
-  // The clips just landed on a free account: ask once, per job, whether they
-  // want the mark off. A beat after the grid renders, so the first thing they
-  // see is their clips and not a modal over them.
-  useEffect(() => {
-    if (status !== 'complete' || plan !== 'free' || !isManaged || !jobId) return;
-    if (!(results?.clips?.length > 0)) return;
-    // Not on top of the tutorial's celebrate step: it shows once that closes.
-    if (tutorialPhase === 'coach' || tutorialPhase === 'celebrate') return;
-    if (wmNoticedJobRef.current === jobId || watermarkNoticeDismissed(jobId)) return;
-    wmNoticedJobRef.current = jobId;
-    const t = setTimeout(() => { if (jobIdRef.current === jobId) setShowWmNotice(true); }, 2500);
-    return () => clearTimeout(t);
-  }, [status, plan, isManaged, jobId, results?.clips?.length, tutorialPhase]);
+  // (Watermark upsell flow removed — app is 100% free.)
 
   // Paying re-points the clips already on screen at their clean twins (the API
   // does it from the Stripe webhook, a few seconds after the plan flips). Chase
@@ -1410,7 +1389,7 @@ function App() {
         <span className={collapsed ? 'hidden lg:block truncate' : 'truncate'}>landing page</span>
       </a>
       <a
-        href="https://github.com/mutonby/videoshorts"
+        href="https://github.com/yogendra1941/VideoShorts"
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-2 px-3 py-2 text-xs lowercase text-muted hover:text-ink2 transition-colors"
@@ -1428,11 +1407,11 @@ function App() {
         </a>
       )}
       <a
-        href="mailto:info@videoshorts.app"
+        href="mailto:info@videoshorts.local"
         className="flex items-center gap-2 px-3 py-2 text-xs lowercase text-muted hover:text-ink2 transition-colors"
       >
         <Mail size={14} className="shrink-0" />
-        <span className={collapsed ? 'hidden lg:block truncate' : 'truncate'}>info@videoshorts.app</span>
+        <span className={collapsed ? 'hidden lg:block truncate' : 'truncate'}>info@videoshorts.local</span>
       </a>
     </>
   );
@@ -1633,28 +1612,13 @@ function App() {
               />
             )}
 
-            {/* Cloud: minutes meter + account/sign-in. For free users the meter
-                opens the upgrade modal — otherwise the only path to a plan is
-                failing against the quota wall. */}
-            {billingEnabled && isManaged && (
-              <UsageMeter onClick={() => {
-                if (plan === 'free') openUpsell({ source: 'meter' });
-                else { window.location.hash = '#/account'; }
-              }} />
-            )}
-            {billingEnabled && isSignedIn && !isManaged && (
-              <button onClick={() => setShowPlanChoice(true)}
-                className="btn-primary px-4 py-2 text-xs">
-                Choose a plan
-              </button>
-            )}
+            {/* (Usage meter / paywall removed — app is 100% free.) */}
             {billingEnabled && !isSignedIn && (
               <button onClick={() => setShowLogin(true)}
                 className="btn-ghost px-4 py-2 text-xs">
                 Sign in
               </button>
             )}
-            {billingEnabled && isSignedIn && <ProfileMenu onUpgrade={isManaged ? openUpsell : null} />}
 
             {/* Hidden below sm: the standing banner underneath already says the
                 same thing, and two warnings in a 360px header is just noise. */}
@@ -1744,10 +1708,7 @@ function App() {
         )}
 
         {/* Included tools (Clip Generator, YouTube Studio): non-blocking trial prompt. */}
-        {gateThisTab && <TrialGate toolName={TOOL_NAMES[activeTab] || 'this'} />}
-
-        {/* Advanced tools (AI Shorts, AI Agent): BYOK fal.ai + ElevenLabs notice. */}
-        {advancedThisTab && <AdvancedBanner needsPlan={needsPlan} onKeys={() => goToTab('settings')} />}
+        {/* Trial/advanced upsell banners removed — app is 100% free. */}
 
         {/* Main Workspace */}
         <div className="flex-1 overflow-hidden relative">
@@ -2063,7 +2024,7 @@ function App() {
                       </p>
                     </div>
                     <a
-                      href="https://github.com/mutonby/skill-autoshorts"
+                      href="https://github.com/yogendra1941/VideoShorts/skill-autoshorts"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-primary py-2 px-4 text-sm shrink-0"
@@ -2073,9 +2034,9 @@ function App() {
                   </div>
 
                   <div className="bg-paper border border-rule rounded-card p-4 font-mono text-xs text-ink2 flex items-center justify-between gap-3">
-                    <span className="truncate">git clone https://github.com/mutonby/skill-autoshorts</span>
+                    <span className="truncate">git clone https://github.com/yogendra1941/VideoShorts/skill-autoshorts</span>
                     <button
-                      onClick={() => navigator.clipboard.writeText('git clone https://github.com/mutonby/skill-autoshorts')}
+                      onClick={() => navigator.clipboard.writeText('git clone https://github.com/yogendra1941/VideoShorts/skill-autoshorts')}
                       className="text-muted hover:text-ink transition-colors shrink-0"
                       title="Copy"
                     >
@@ -2120,23 +2081,13 @@ function App() {
           {activeTab === 'autopilot' && (
             <div className="h-full overflow-y-auto custom-scrollbar animate-fade">
               <div className="max-w-6xl mx-auto p-4 sm:p-6 md:p-8">
-                {isSignedIn ? (
-                  <AutopilotTab
-                    onOpenProject={restoreProject}
-                    onUpgrade={() => (isManaged ? openUpsell({ source: 'autopilot' }) : setShowPlanChoice(true))}
-                    justConnected={autopilotConnected}
-                  />
-                ) : (
-                  <div className="max-w-2xl mx-auto card p-8 text-center">
-                    <Rocket size={28} className="mx-auto mb-4 text-brass" />
-                    <h1 className="font-display lowercase text-2xl text-ink mb-2">your channel, clipped on its own</h1>
-                    <p className="text-muted text-sm mb-6">
-                      Connect your YouTube channel and every new video turns into shorts automatically.
-                      Sign in to set it up.
-                    </p>
-                    <button onClick={() => setShowLogin(true)} className="btn-primary">sign in</button>
-                  </div>
-                )}
+                <div className="max-w-2xl mx-auto card p-8 text-center">
+                  <Rocket size={28} className="mx-auto mb-4 text-brass" />
+                  <h1 className="font-display lowercase text-2xl text-ink mb-2">your channel, clipped on its own</h1>
+                  <p className="text-muted text-sm mb-6">
+                    Connect your YouTube channel and every new video turns into shorts automatically.
+                  </p>
+                </div>
               </div>
             </div>
           )}
@@ -2754,36 +2705,7 @@ function App() {
           onDismissCelebrate={finishTutorial}
         />
       )}
-      {showPlanChoice && <PlanChoiceModal onClose={() => setShowPlanChoice(false)} />}
-      {showWmNotice && (
-        <WatermarkModal
-          source="results"
-          jobId={jobId}
-          previewSrc={results?.clips?.[0]?.video_url ? getApiUrl(results.clips[0].video_url) : null}
-          onUpgrade={openUpsell}
-          onClose={() => setShowWmNotice(false)}
-        />
-      )}
-      {showTopUp && (
-        <TopUpModal
-          onClose={() => setShowTopUp(false)}
-          required={topUpInfo.required}
-          remaining={topUpInfo.remaining}
-          partialMinutes={topUpInfo.partialMinutes}
-          onPartial={topUpInfo.onPartial}
-          context={topUpInfo.context || 'wall'}
-          source={topUpInfo.source}
-          highlight={topUpInfo.highlight}
-          partialJob={topUpInfo.partialJob}
-        />
-      )}
-      {showTrialUpgrade && (
-        <TrialUpgradeModal
-          plan={plan}
-          onActivated={refreshMe}
-          onClose={() => setShowTrialUpgrade(false)}
-        />
-      )}
+      {/* Plan/paywall modals removed — app is 100% free. */}
     </div>
   );
 }

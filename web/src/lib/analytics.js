@@ -3,7 +3,7 @@ import { firstTouchProps } from './attribution';
 
 // Lightweight custom-event helper (OpenPanel).
 //
-// The hosted videoshorts.app build loads OpenPanel (see index.html), which
+// The hosted videoshorts.local build loads OpenPanel (see index.html), which
 // exposes `window.op`. Self-hosted builds, ad-blockers or offline dev simply
 // won't have it — every call here is a safe no-op in that case, so analytics
 // can never break the app or leak into the open-source experience.

@@ -8,8 +8,6 @@ import ApiKeysCard from './ApiKeysCard';
 import McpConnectCard from './McpConnectCard';
 import DeleteAccountCard from './DeleteAccountCard';
 import SocialAnalyticsCard from './SocialAnalyticsCard';
-import InvoicesCard from './InvoicesCard';
-import CancelPlanModal from './CancelPlanModal';
 
 const fmt1 = (n) => Math.round((n || 0) * 10) / 10;
 
@@ -80,7 +78,7 @@ export default function AccountPage() {
   }, [refreshMe]);
 
   useEffect(() => {
-    apiJson('/api/billing/plans').then((d) => setTopups(d.topups || [])).catch(() => {});
+    apiJson('/api/billing/plans').then((d) => setTopups(d.topups || [])).catch(() => { });
   }, []);
 
   const openPortal = useCallback(async () => {
@@ -168,8 +166,8 @@ export default function AccountPage() {
                 showing raw Stripe jargon ("past_due") twice explains nothing. */}
             {me.status && me.status !== 'active' && me.status !== 'on_hold'
               && !PAYMENT_ISSUE_STATES.includes(me.status) && (
-              <span className="badge-warn">{me.status}</span>
-            )}
+                <span className="badge-warn">{me.status}</span>
+              )}
             {me.cancel_at_period_end && (
               <span className="badge-warn">cancels at period end</span>
             )}
@@ -197,7 +195,7 @@ export default function AccountPage() {
               ? 'Your payment was never completed, so the plan never started.'
               : 'Your plan is paused and you\'re on free minutes until it goes through.'}{' '}
             <button onClick={openPortal} disabled={busy}
-                    className="underline underline-offset-2 hover:text-ink">
+              className="underline underline-offset-2 hover:text-ink">
               Update your card
             </button>{' '}
             and it resumes right away.
@@ -241,7 +239,7 @@ export default function AccountPage() {
         {me.has_billing_account && CANCELLABLE_STATES.includes(me.status) && !me.cancel_at_period_end && (
           <div className="pt-4 mt-4 border-t border-rule text-right">
             <button onClick={() => { track('CancelFlowOpened', { props: { plan } }); setCancelOpen(true); }}
-                    className="text-xs text-muted underline underline-offset-2 hover:text-ink">
+              className="text-xs text-muted underline underline-offset-2 hover:text-ink">
               Cancel subscription
             </button>
           </div>
@@ -255,18 +253,6 @@ export default function AccountPage() {
           </div>
         )}
       </div>
-
-      {cancelOpen && (
-        <CancelPlanModal
-          plan={plan}
-          periodEnd={me.period_end}
-          onClose={() => setCancelOpen(false)}
-          onCanceled={() => { setCancelOpen(false); refreshMe(); }}
-        />
-      )}
-
-      {/* Only accounts that ever had a Stripe relationship can have invoices. */}
-      {me.has_billing_account && <InvoicesCard />}
 
       <SocialAnalyticsCard />
 

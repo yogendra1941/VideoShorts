@@ -9,7 +9,6 @@ import HookModal from './HookModal';
 import TranslateModal from './TranslateModal';
 import Modal from './ui/Modal';
 import SegmentedControl from './ui/SegmentedControl';
-import WatermarkModal, { watermarkNoticeDismissed } from './WatermarkModal';
 import TikTokDraftNotice from './TikTokDraftNotice';
 import { useAuth } from '../contexts/AuthContext';
 import { renderInBrowser } from '../lib/renderInBrowser';
@@ -78,7 +77,6 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
     }, [clip.why]);
     const [showDescModal, setShowDescModal] = useState(false);
     const [showSubtitleModal, setShowSubtitleModal] = useState(false);
-    const [showWatermarkModal, setShowWatermarkModal] = useState(false);
     const { plan } = useAuth();
     const videoRef = React.useRef(null);
     // Pristine base clip (no burned subtitles/hook), stable regardless of how
@@ -135,7 +133,7 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
                 const reader = response.body.getReader();
                 const chunks = [];
                 let received = 0;
-                for (;;) {
+                for (; ;) {
                     const { done, value } = await reader.read();
                     if (done) break;
                     chunks.push(value);
@@ -312,7 +310,7 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
             .then(data => {
                 if (data && data.durationSec) setClipDuration(data.durationSec);
             })
-            .catch(() => {});
+            .catch(() => { });
     }, [jobId, index]);
 
     // Which platforms the selected profile actually has linked. `null` means
@@ -1101,12 +1099,6 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            // Free clips are watermarked — surface the upsell once
-                            // before the first download, then get out of the way.
-                            if (plan === 'free' && !watermarkNoticeDismissed(jobId)) {
-                                setShowWatermarkModal(true);
-                                return;
-                            }
                             downloadClip();
                         }}
                         className={`${QUIET_BTN}${onEditClip ? ' col-span-2' : ''}`}
@@ -1315,16 +1307,6 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
                 videoUrl={currentVideoUrl}
                 hasApiKey={!!elevenLabsKey}
             />
-
-            {showWatermarkModal && (
-                <WatermarkModal
-                    source="download"
-                    jobId={jobId}
-                    onUpgrade={onUpgrade}
-                    onClose={() => setShowWatermarkModal(false)}
-                    onContinue={downloadClip}
-                />
-            )}
 
         </div>
     );

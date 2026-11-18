@@ -62,7 +62,7 @@ export default function DeleteAccountCard() {
       window.location.hash = '#/deleted';
       window.location.reload();
     } catch (e) {
-      setError(e?.detail || 'Could not delete your account. Please try again or email info@videoshorts.app.');
+      setError(e?.detail || 'Could not delete your account. Please try again or email info@videoshorts.local.');
       sending.current = false;
       setBusy(false);
     }

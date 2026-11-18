@@ -22,7 +22,6 @@ import { guidePages } from './guide-pages.js'
 import { clipToolPages } from './clip-tools.js'
 import { hubPages } from './hub-pages.js'
 import { productPages } from './product-pages.js'
-import { pricingPage } from './pricing-page.js'
 
 const li = (items) => `<ul>${items.map((i) => `<li>${i}</li>`).join('')}</ul>`
 const ol = (items) => `<ol>${items.map((i) => `<li>${i}</li>`).join('')}</ol>`
@@ -294,9 +293,9 @@ function competitorPage(slug) {
 
   const layoutsLine = c.rows?.['AI voice dubbing, 30+ languages']
     ? pick([
-        'Where it goes further is the clipping itself: two speakers stacked when both are on camera, screen recordings kept readable over the presenter, and a webcam inset enlarged instead of cropped out.',
-        'The gap is in the framing: VideoShorts keeps two people on camera stacked in half-frames, keeps a shared screen legible above the presenter, and enlarges a webcam inset rather than cropping it away.',
-      ])
+      'Where it goes further is the clipping itself: two speakers stacked when both are on camera, screen recordings kept readable over the presenter, and a webcam inset enlarged instead of cropped out.',
+      'The gap is in the framing: VideoShorts keeps two people on camera stacked in half-frames, keeps a shared screen legible above the presenter, and enlarges a webcam inset rather than cropping it away.',
+    ])
     : `It adds two things ${esc(c.name)} does not have: AI voice dubbing into more than 30 languages (with your own ElevenLabs key) and an AI UGC generator with lip-synced actors.`
   const caveat = pick([
     `The caveat is the setup: the free edition runs on your own machine with Docker, and the no-setup version is VideoShorts Cloud, a paid service above ${CLOUD.freeMinutes} minutes a month.`,
@@ -319,13 +318,12 @@ ${li(c.tiers.map(([n, d]) => `<strong>${esc(n)}</strong>: ${esc(d)}`))}
 ${c.tierNote ? `<p>${esc(c.tierNote)}</p>` : ''}
 
 <h2>Is ${esc(c.name)} free?</h2>
-${
-  c.isFree
-    ? `<p>${esc(c.isFree)} For comparison, VideoShorts Cloud's free plan is ${FREE_CLOUD}, with paid plans from $${STARTER.monthly.price}/month, and the self-hosted edition has no limit at all.</p>`
-    : `<p>Not in the usual sense. ${esc(sentence(c.tiers[0][1]))} After that the cheapest plan is
+${c.isFree
+      ? `<p>${esc(c.isFree)} For comparison, VideoShorts Cloud's free plan is ${FREE_CLOUD}, with paid plans from $${STARTER.monthly.price}/month, and the self-hosted edition has no limit at all.</p>`
+      : `<p>Not in the usual sense. ${esc(sentence(c.tiers[0][1]))} After that the cheapest plan is
 ${esc(c.entryPrice)}. If a free plan you can keep using is the requirement,
 VideoShorts has one: ${FREE_CLOUD}, with paid plans from $${STARTER.monthly.price}/month, or no limit at all self-hosted.</p>`
-}
+    }
 
 <h2>${esc(c.name)}'s limits</h2>
 <div class="note"><span class="label">What to check before paying</span><p>${esc(c.gotcha)}</p></div>
@@ -348,30 +346,28 @@ ${demo}
 ${extra.afterIntro || ''}
 
 <h2>What does ${esc(c.name)} cost?</h2>
-${
-  comp.pricing
-    ? `<p>The cheapest paid plan is ${esc(c.entryPrice)}. On the free side: ${esc(sentence(c.tiers[0][1]))}
+${comp.pricing
+      ? `<p>The cheapest paid plan is ${esc(c.entryPrice)}. On the free side: ${esc(sentence(c.tiers[0][1]))}
 Every plan, what each one includes and the free-plan limits are in
 <a href="${comp.pricing}">${esc(comp.pricingLabel)}</a>.</p>`
-    : `${li(c.tiers.map(([n, d]) => `<strong>${esc(n)}</strong>: ${esc(d)}`))}
+      : `${li(c.tiers.map(([n, d]) => `<strong>${esc(n)}</strong>: ${esc(d)}`))}
 ${c.tierNote ? `<p>${esc(c.tierNote)}</p>` : ''}`
-}
+    }
 <div class="note"><span class="label">The part that catches people out</span><p>${esc(c.gotcha)}</p></div>
 `
 
   const body = `
 ${c.review ? reviewIntro : compareIntro}
-${
-  PRICE_MODELS[slug]
-    ? `<h2>What would you pay for your own usage?</h2>
+${PRICE_MODELS[slug]
+      ? `<h2>What would you pay for your own usage?</h2>
 <p>${[
-  `Move the slider to the number of minutes of source video you clip in a month. Each bar is the cheapest published plan that covers it.`,
-  `${esc(c.name)} bills by the minute of video, so the honest comparison is your own monthly minutes. Set them below; each bar is the cheapest published plan that covers that number.`,
-  `A meter on source length makes the price depend on what you import, not on the clips you keep. Drag to your monthly minutes and read the cheapest plan at each tool.`,
-][Object.keys(COMPETITORS).filter((s) => PRICE_MODELS[s]).indexOf(slug) % 3]}</p>
+        `Move the slider to the number of minutes of source video you clip in a month. Each bar is the cheapest published plan that covers it.`,
+        `${esc(c.name)} bills by the minute of video, so the honest comparison is your own monthly minutes. Set them below; each bar is the cheapest published plan that covers that number.`,
+        `A meter on source length makes the price depend on what you import, not on the clips you keep. Drag to your monthly minutes and read the cheapest plan at each tool.`,
+      ][Object.keys(COMPETITORS).filter((s) => PRICE_MODELS[s]).indexOf(slug) % 3]}</p>
 ${costCalculator(slug === 'opus-clip' ? [slug, 'vizard'] : [slug, 'opus-clip'])}`
-    : ''
-}
+      : ''
+    }
 
 <h2>What does VideoShorts cost?</h2>
 ${pricingParagraph('competitor', c)}
@@ -381,20 +377,18 @@ ${pricingParagraph('competitor', c)}
 <thead><tr><th>Feature</th><th>VideoShorts</th><th>${esc(c.name)}</th></tr></thead>
 <tbody>${rows}</tbody>
 </table>
-${
-  c.review || comp.review
-    ? ''
-    : `
+${c.review || comp.review
+      ? ''
+      : `
 <h2>What ${esc(c.name)} does better</h2>
 ${li(c.strengths.map(esc))}`
-}
-${
-  c.review && !c.forWhom
-    ? ''
-    : `
+    }
+${c.review && !c.forWhom
+      ? ''
+      : `
 <h2>When to stay on ${esc(c.name)}</h2>
 ${li(c.stay.map(esc))}`
-}
+    }
 
 <h2>Where the two differ</h2>
 ${li(c.whereWeDiffer.map(esc))}
@@ -409,10 +403,10 @@ ${c.pick ? verdictCards(c.name, c.pick.them, c.pick.us) : ''}
 ${faqBlock(faq)}
 
 ${sources([
-  `${esc(c.name)} pricing, checked ${esc(c.checked)} on the vendor's public pricing page.`,
-  ...(c.sources || []).map(([label, url]) => `${esc(label)}, checked ${esc(c.checked)}: <a href="${esc(url)}" rel="nofollow noopener">${esc(url.replace(/^https:\/\//, ''))}</a>`),
-  `VideoShorts pipeline details from the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+      `${esc(c.name)} pricing, checked ${esc(c.checked)} on the vendor's public pricing page.`,
+      ...(c.sources || []).map(([label, url]) => `${esc(label)}, checked ${esc(c.checked)}: <a href="${esc(url)}" rel="nofollow noopener">${esc(url.replace(/^https:\/\//, ''))}</a>`),
+      `VideoShorts pipeline details from the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+    ])}
 `
 
   return {
@@ -475,26 +469,26 @@ const hubPage = () => {
   }).join('')
   const checked = ALTERNATIVES.map((s) => COMPETITORS[s].checked).sort()[0]
   return {
-  path: '/alternatives',
-  facts: [
-    { k: 'Tools compared', v: '10', s: 'VideoShorts and 9 cloud tools' },
-    { k: 'Cheapest paid', v: '$9.90/mo', s: '2short.ai; VideoShorts Cloud $12 monthly' },
-    { k: 'Open source', v: '1 of 10', s: 'Only VideoShorts can be self-hosted' },
-    { k: 'Prices checked', v: 'Oct 2026', s: 'On every vendor pricing page' },
-  ],
-  title: 'Open Source Opus Clip & Klap Alternatives | VideoShorts',
-  description:
-    'VideoShorts vs Opus Clip, Klap, Vizard, Submagic, Quso (Vidyo.ai), 2short and SendShort: pricing checked October 2026, free plans, and where each wins.',
-  h1: 'Open source alternatives to the main AI clipping tools',
-  breadcrumb: [{ name: 'Alternatives' }],
-  updated: REVISED,
-  pasteLink: true,
-  tldr: [
-    `VideoShorts is the only open source, self-hostable tool in this category: ${esc(OS_PRICE_CLAUSE)}. Every other tool on this page is a closed-source cloud service.`,
-    'Cheapest paid entry points as of October 2026: 2short.ai $9.90/month, VideoShorts Cloud $12/month billed monthly, then Submagic $12, Klap $14 and Vizard $14.50 a month on yearly billing, and Opus Clip $15/month. VideoShorts self-hosted is $0 with no cap.',
-    'The tools are not interchangeable. Submagic is a caption editor that added clipping, Quso and SendShort are suites where clipping is one feature, and Vizard expects you in a timeline. The individual comparisons below say where each one genuinely wins.',
-  ],
-  body: `
+    path: '/alternatives',
+    facts: [
+      { k: 'Tools compared', v: '10', s: 'VideoShorts and 9 cloud tools' },
+      { k: 'Cheapest paid', v: '$9.90/mo', s: '2short.ai; VideoShorts Cloud $12 monthly' },
+      { k: 'Open source', v: '1 of 10', s: 'Only VideoShorts can be self-hosted' },
+      { k: 'Prices checked', v: 'Oct 2026', s: 'On every vendor pricing page' },
+    ],
+    title: 'Open Source Opus Clip & Klap Alternatives | VideoShorts',
+    description:
+      'VideoShorts vs Opus Clip, Klap, Vizard, Submagic, Quso (Vidyo.ai), 2short and SendShort: pricing checked October 2026, free plans, and where each wins.',
+    h1: 'Open source alternatives to the main AI clipping tools',
+    breadcrumb: [{ name: 'Alternatives' }],
+    updated: REVISED,
+    pasteLink: true,
+    tldr: [
+      `VideoShorts is the only open source, self-hostable tool in this category: ${esc(OS_PRICE_CLAUSE)}. Every other tool on this page is a closed-source cloud service.`,
+      'Cheapest paid entry points as of October 2026: 2short.ai $9.90/month, VideoShorts Cloud $12/month billed monthly, then Submagic $12, Klap $14 and Vizard $14.50 a month on yearly billing, and Opus Clip $15/month. VideoShorts self-hosted is $0 with no cap.',
+      'The tools are not interchangeable. Submagic is a caption editor that added clipping, Quso and SendShort are suites where clipping is one feature, and Vizard expects you in a timeline. The individual comparisons below say where each one genuinely wins.',
+    ],
+    body: `
 <h2>How these tools actually differ</h2>
 <p>All of them are described as "AI clipping tools", which hides the fact that
 they do different jobs. Some take a long video and decide what to cut. Some are
@@ -525,7 +519,7 @@ ${pricingParagraph('hub')}
 
 ${faqBlock(HUB_FAQ)}
 `,
-  faq: HUB_FAQ,
+    faq: HUB_FAQ,
   }
 }
 
@@ -668,35 +662,35 @@ constraint for most people is not whether short video works, it is that cutting 
 60-minute recording into 12 posts by hand takes longer than recording it did.</p>
 
 ${faqBlock([
-  {
-    q: 'Is VideoShorts free forever or a trial?',
-    a: 'The self-hosted edition is free forever under the MIT licence, with no watermark and no cap. It is not a trial and there is no metering in it. VideoShorts Cloud is a separate hosted service with a permanently free 20 minute per month tier and paid plans from $12/month.',
-  },
-  {
-    q: 'Does the free version add a watermark?',
-    a: 'The self-hosted edition never adds a watermark. The free tier of VideoShorts Cloud does; paid Cloud plans from $12/month do not.',
-  },
-  {
-    q: 'Do I need to pay for an API key?',
-    a: 'You need a Google Gemini API key for the self-hosted edition. Its free tier covers 1,500 requests a day, which is more than enough for individual use. ElevenLabs for dubbing and fal.ai for AI UGC video are optional and billed by those vendors. VideoShorts Cloud includes the keys.',
-  },
-  {
-    q: 'How many clips does it generate per video?',
-    a: 'Between 3 and 15, each 15 to 60 seconds long. The number depends on how much of the source actually holds up as a standalone clip rather than on a fixed quota.',
-  },
-  {
-    q: 'Is there a free clipping website that needs no install?',
-    a: 'Yes. videoshorts.app clips 20 minutes of video a month in the browser with no credit card. Those clips carry a watermark; paid plans from $12/month remove it.',
-  },
-  {
-    q: 'Is there a free AI clipper with no watermark?',
-    a: 'Yes, self-hosted: VideoShorts is MIT licensed, runs with Docker, and has no watermark and no usage cap; you bring your own Gemini API key. On VideoShorts Cloud the free plan is watermarked and every paid plan from $12/month is not.',
-  },
-  {
-    q: 'How do I remove the watermark from a clip that already has one?',
-    a: 'You do not, practically. Watermarks are burned into the pixels, and cropping or blurring them degrades the clip. The reliable fix is generating the clip without one: a paid plan on your current tool, or a tool with no watermark to begin with. On VideoShorts Cloud, upgrading removes the mark from the clips you already made.',
-  },
-])}
+    {
+      q: 'Is VideoShorts free forever or a trial?',
+      a: 'The self-hosted edition is free forever under the MIT licence, with no watermark and no cap. It is not a trial and there is no metering in it. VideoShorts Cloud is a separate hosted service with a permanently free 20 minute per month tier and paid plans from $12/month.',
+    },
+    {
+      q: 'Does the free version add a watermark?',
+      a: 'The self-hosted edition never adds a watermark. The free tier of VideoShorts Cloud does; paid Cloud plans from $12/month do not.',
+    },
+    {
+      q: 'Do I need to pay for an API key?',
+      a: 'You need a Google Gemini API key for the self-hosted edition. Its free tier covers 1,500 requests a day, which is more than enough for individual use. ElevenLabs for dubbing and fal.ai for AI UGC video are optional and billed by those vendors. VideoShorts Cloud includes the keys.',
+    },
+    {
+      q: 'How many clips does it generate per video?',
+      a: 'Between 3 and 15, each 15 to 60 seconds long. The number depends on how much of the source actually holds up as a standalone clip rather than on a fixed quota.',
+    },
+    {
+      q: 'Is there a free clipping website that needs no install?',
+      a: 'Yes. videoshorts.app clips 20 minutes of video a month in the browser with no credit card. Those clips carry a watermark; paid plans from $12/month remove it.',
+    },
+    {
+      q: 'Is there a free AI clipper with no watermark?',
+      a: 'Yes, self-hosted: VideoShorts is MIT licensed, runs with Docker, and has no watermark and no usage cap; you bring your own Gemini API key. On VideoShorts Cloud the free plan is watermarked and every paid plan from $12/month is not.',
+    },
+    {
+      q: 'How do I remove the watermark from a clip that already has one?',
+      a: 'You do not, practically. Watermarks are burned into the pixels, and cropping or blurring them degrades the clip. The reliable fix is generating the clip without one: a paid plan on your current tool, or a tool with no watermark to begin with. On VideoShorts Cloud, upgrading removes the mark from the clips you already made.',
+    },
+  ])}
 `,
   faq: [
     {
@@ -775,19 +769,19 @@ trade-off is real in both directions: they ship more caption presets and require
 no setup, and you cannot read a line of what they do with your video.</p>
 
 ${faqBlock([
-  {
-    q: 'Is there an open source alternative to Opus Clip?',
-    a: 'Yes. VideoShorts is MIT-licensed and self-hostable with Docker, and covers the same core job: AI moment detection, face-tracked 9:16 reframing and word-level subtitles. Opus Clip is closed source and cloud only, starting at $15/month.',
-  },
-  {
-    q: 'Can I run it without sending video to any third party?',
-    a: 'Transcription, scene detection, reframing and encoding all run locally. Moment scoring calls the Google Gemini API, which receives the transcript rather than the video file. Dubbing and AI UGC generation are optional and call ElevenLabs and fal.ai respectively; leave them off and nothing but transcript text leaves the machine.',
-  },
-  {
-    q: 'What licence is VideoShorts released under?',
-    a: 'MIT for the core application. The cloud/ directory covering billing and hosted infrastructure is under a separate commercial licence and is not required for self-hosting.',
-  },
-])}
+    {
+      q: 'Is there an open source alternative to Opus Clip?',
+      a: 'Yes. VideoShorts is MIT-licensed and self-hostable with Docker, and covers the same core job: AI moment detection, face-tracked 9:16 reframing and word-level subtitles. Opus Clip is closed source and cloud only, starting at $15/month.',
+    },
+    {
+      q: 'Can I run it without sending video to any third party?',
+      a: 'Transcription, scene detection, reframing and encoding all run locally. Moment scoring calls the Google Gemini API, which receives the transcript rather than the video file. Dubbing and AI UGC generation are optional and call ElevenLabs and fal.ai respectively; leave them off and nothing but transcript text leaves the machine.',
+    },
+    {
+      q: 'What licence is VideoShorts released under?',
+      a: 'MIT for the core application. The cloud/ directory covering billing and hosted infrastructure is under a separate commercial licence and is not required for self-hosting.',
+    },
+  ])}
 `,
   faq: [
     {
@@ -845,19 +839,19 @@ entirely transcription and encoding; the model call is a small fraction of it.</
 ${pricingParagraph('how')}
 
 ${faqBlock([
-  {
-    q: 'What AI model does VideoShorts use to find viral moments?',
-    a: 'Google Gemini 3.1 Flash-Lite. It receives the word-level transcript with timestamps together with PySceneDetect scene boundaries, and returns 3 to 15 segments of 15 to 60 seconds scored on hook strength, emotional payload and whether the segment stands alone without surrounding context.',
-  },
-  {
-    q: 'How does the automatic vertical cropping work?',
-    a: 'Two modes. TRACK mode follows a single subject using MediaPipe face detection with a YOLOv8 fallback, stabilised so the crop holds still inside a safe zone instead of following every movement. GENERAL mode handles group shots and landscapes by preserving the full width over a blurred backdrop.',
-  },
-  {
-    q: 'Can it dub clips into other languages?',
-    a: 'Yes, with your own ElevenLabs API key, into more than 30 languages, preserving the original speaker\'s voice characteristics. The dubbed audio is then re-transcribed so the burned-in subtitles match the new language rather than the original.',
-  },
-])}
+    {
+      q: 'What AI model does VideoShorts use to find viral moments?',
+      a: 'Google Gemini 3.1 Flash-Lite. It receives the word-level transcript with timestamps together with PySceneDetect scene boundaries, and returns 3 to 15 segments of 15 to 60 seconds scored on hook strength, emotional payload and whether the segment stands alone without surrounding context.',
+    },
+    {
+      q: 'How does the automatic vertical cropping work?',
+      a: 'Two modes. TRACK mode follows a single subject using MediaPipe face detection with a YOLOv8 fallback, stabilised so the crop holds still inside a safe zone instead of following every movement. GENERAL mode handles group shots and landscapes by preserving the full width over a blurred backdrop.',
+    },
+    {
+      q: 'Can it dub clips into other languages?',
+      a: 'Yes, with your own ElevenLabs API key, into more than 30 languages, preserving the original speaker\'s voice characteristics. The dubbed audio is then re-transcribed so the burned-in subtitles match the new language rather than the original.',
+    },
+  ])}
 `,
   faq: [
     {
@@ -926,24 +920,24 @@ If you want a small script you can read in an hour, the smaller repos are a
 better fit, and that is a real recommendation rather than false modesty.</p>
 
 ${faqBlock([
-  {
-    q: 'Is there a free open source AI video generator?',
-    a: 'Yes, in both senses. For text-to-video, Genmo’s Mochi 1, Open-Sora and HunyuanVideo publish open weights and need a powerful GPU. For making clips from your own footage, VideoShorts is MIT-licensed and runs with Docker on an ordinary machine: free self-hosted with no watermark, or hosted from $12/month.',
-  },
-  {
-    q: 'Can open source AI generate videos from text?',
-    a: 'Yes. Mochi 1 (Apache 2.0), Open-Sora and HunyuanVideo generate footage from prompts. Expect to need a high-end GPU, and expect quality below the closed frontier models. VideoShorts is not a text-to-video tool; it turns long real footage into short vertical clips.',
-  },
-  {
-    q: 'What is the best open source AI video generator for shorts?',
-    a: 'For turning long recordings into publishable vertical shorts with subtitles, VideoShorts covers the widest pipeline: AI moment scoring, face-tracked reframing, split-screen layouts, dubbing and direct social publishing, MIT-licensed. Simpler repos like AI-Youtube-Shorts-Generator cover a leaner version of the same job with less to configure.',
-  },
-])}
+    {
+      q: 'Is there a free open source AI video generator?',
+      a: 'Yes, in both senses. For text-to-video, Genmo’s Mochi 1, Open-Sora and HunyuanVideo publish open weights and need a powerful GPU. For making clips from your own footage, VideoShorts is MIT-licensed and runs with Docker on an ordinary machine: free self-hosted with no watermark, or hosted from $12/month.',
+    },
+    {
+      q: 'Can open source AI generate videos from text?',
+      a: 'Yes. Mochi 1 (Apache 2.0), Open-Sora and HunyuanVideo generate footage from prompts. Expect to need a high-end GPU, and expect quality below the closed frontier models. VideoShorts is not a text-to-video tool; it turns long real footage into short vertical clips.',
+    },
+    {
+      q: 'What is the best open source AI video generator for shorts?',
+      a: 'For turning long recordings into publishable vertical shorts with subtitles, VideoShorts covers the widest pipeline: AI moment scoring, face-tracked reframing, split-screen layouts, dubbing and direct social publishing, MIT-licensed. Simpler repos like AI-Youtube-Shorts-Generator cover a leaner version of the same job with less to configure.',
+    },
+  ])}
 
 ${sources([
-  'Open-weight text-to-video model landscape checked 2026-08-04 on the respective GitHub repositories.',
-  `VideoShorts source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+    'Open-weight text-to-video model landscape checked 2026-08-04 on the respective GitHub repositories.',
+    `VideoShorts source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+  ])}
 `,
   faq: [
     {
@@ -1130,29 +1124,29 @@ YouTube first, a clipper that starts from the link avoids exporting and
 re-uploading an hour of video.</p>
 
 ${faqBlock([
-  {
-    q: 'How do I turn a podcast into clips for free?',
-    a: 'Self-host VideoShorts: clone the MIT-licensed repo, run docker compose up, add a free-tier Google Gemini API key and paste your episode link. No watermark and no cap. If you would rather not run anything, VideoShorts Cloud clips your first episode free up to 60 minutes, then 20 minutes a month, with a watermark; paid plans start at $12/month.',
-  },
-  {
-    q: 'What is the best podcast clip maker?',
-    a: 'It depends on how you record. For a video podcast with two people on camera, pick a tool that keeps both in frame: VideoShorts stacks them in a split layout when both are visible. If you record in Riverside, its built-in Magic Clips are the most convenient. For an audio-only show, an audiogram tool such as Headliner fits better than any video clipper.',
-  },
-  {
-    q: 'How does it handle two people talking?',
-    a: 'Scenes where both faces share the frame at least half the time render as a stacked split layout so both speakers stay visible. Optionally it hard-cuts to the active speaker instead, using per-speaker normalised mouth activity to decide who is talking.',
-  },
-  {
-    q: 'Does it work with hour-long episodes?',
-    a: 'Yes, long-form is the design case. Processing time scales with length: on CPU roughly 5 to 8 minutes of processing per 8 minutes of source, on an NVIDIA GPU about a tenth of that. The AI moment scoring reads the transcript rather than the raw video, so episode length does not degrade selection quality.',
-  },
-  ...PODCAST_EXTRA_FAQ,
-])}
+    {
+      q: 'How do I turn a podcast into clips for free?',
+      a: 'Self-host VideoShorts: clone the MIT-licensed repo, run docker compose up, add a free-tier Google Gemini API key and paste your episode link. No watermark and no cap. If you would rather not run anything, VideoShorts Cloud clips your first episode free up to 60 minutes, then 20 minutes a month, with a watermark; paid plans start at $12/month.',
+    },
+    {
+      q: 'What is the best podcast clip maker?',
+      a: 'It depends on how you record. For a video podcast with two people on camera, pick a tool that keeps both in frame: VideoShorts stacks them in a split layout when both are visible. If you record in Riverside, its built-in Magic Clips are the most convenient. For an audio-only show, an audiogram tool such as Headliner fits better than any video clipper.',
+    },
+    {
+      q: 'How does it handle two people talking?',
+      a: 'Scenes where both faces share the frame at least half the time render as a stacked split layout so both speakers stay visible. Optionally it hard-cuts to the active speaker instead, using per-speaker normalised mouth activity to decide who is talking.',
+    },
+    {
+      q: 'Does it work with hour-long episodes?',
+      a: 'Yes, long-form is the design case. Processing time scales with length: on CPU roughly 5 to 8 minutes of processing per 8 minutes of source, on an NVIDIA GPU about a tenth of that. The AI moment scoring reads the transcript rather than the raw video, so episode length does not degrade selection quality.',
+    },
+    ...PODCAST_EXTRA_FAQ,
+  ])}
 
 ${sources([
-  'Competitor per-minute credit billing checked 2026-10-05 on vendor pricing and help pages.',
-  `Split-layout and speaker-cut implementation in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+    'Competitor per-minute credit billing checked 2026-10-05 on vendor pricing and help pages.',
+    `Split-layout and speaker-cut implementation in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+  ])}
 `,
   faq: [
     {
@@ -1228,19 +1222,19 @@ your call and your responsibility.</p>
 ${pricingParagraph('youtube')}
 
 ${faqBlock([
-  {
-    q: 'Can I convert a YouTube video to Shorts for free?',
-    a: 'Yes, two ways. Self-host VideoShorts (MIT licence, Docker, your own free-tier Gemini API key): unlimited, no watermark. Or use the hosted free tier: 20 minutes of source video a month, watermarked, no credit card. Paid hosted plans without watermark start at $12/month.',
-  },
-  {
-    q: 'Do I need to download the video first?',
-    a: 'No. Paste the URL and VideoShorts fetches the source itself on every tier, including free ones. Local file upload is also supported when the source is not online.',
-  },
-  {
-    q: 'Can I clip a video from someone else’s channel?',
-    a: 'Technically yes, legally only with rights or permission. Use it for your own content, channels you manage, or footage you have licensed. Unauthorized reuploads are copyright infringement and platforms strike them.',
-  },
-])}
+    {
+      q: 'Can I convert a YouTube video to Shorts for free?',
+      a: 'Yes, two ways. Self-host VideoShorts (MIT licence, Docker, your own free-tier Gemini API key): unlimited, no watermark. Or use the hosted free tier: 20 minutes of source video a month, watermarked, no credit card. Paid hosted plans without watermark start at $12/month.',
+    },
+    {
+      q: 'Do I need to download the video first?',
+      a: 'No. Paste the URL and VideoShorts fetches the source itself on every tier, including free ones. Local file upload is also supported when the source is not online.',
+    },
+    {
+      q: 'Can I clip a video from someone else’s channel?',
+      a: 'Technically yes, legally only with rights or permission. Use it for your own content, channels you manage, or footage you have licensed. Unauthorized reuploads are copyright infringement and platforms strike them.',
+    },
+  ])}
 `,
   faq: [
     {
@@ -1339,24 +1333,24 @@ status, clips, quota, subtitles and publishing. The endpoint, the tool table and
 client setup live on the <a href="/mcp">MCP server and API page</a>.</p>
 
 ${faqBlock([
-  {
-    q: 'Can I automate YouTube Shorts creation with an open source tool?',
-    a: 'Yes. VideoShorts is MIT-licensed and its self-hosted edition serves the same REST API and MCP server as the hosted service, with no metering. One POST submits a video, a signed webhook returns the finished clips, and the publishing endpoint posts them to YouTube Shorts, TikTok and Instagram Reels.',
-  },
-  {
-    q: 'Is there an n8n integration for VideoShorts?',
-    a: 'Yes: an importable workflow at /n8n-youtube-shorts-automation watches a YouTube channel, clips each video, sends the clips to Telegram for approval and schedules the approved ones to your socials. Nothing forces you to use it, though, since the integration is just an HTTP Request node posting to /api/process plus a Webhook trigger.',
-  },
-  {
-    q: 'Do automated API calls cost more than using the dashboard?',
-    a: 'No. API and MCP usage draws from the same minute balance as the dashboard with no per-call pricing: 20 free minutes a month on the hosted free tier, flat paid plans from $12/month, and no meter at all on the self-hosted edition.',
-  },
-])}
+    {
+      q: 'Can I automate YouTube Shorts creation with an open source tool?',
+      a: 'Yes. VideoShorts is MIT-licensed and its self-hosted edition serves the same REST API and MCP server as the hosted service, with no metering. One POST submits a video, a signed webhook returns the finished clips, and the publishing endpoint posts them to YouTube Shorts, TikTok and Instagram Reels.',
+    },
+    {
+      q: 'Is there an n8n integration for VideoShorts?',
+      a: 'Yes: an importable workflow at /n8n-youtube-shorts-automation watches a YouTube channel, clips each video, sends the clips to Telegram for approval and schedules the approved ones to your socials. Nothing forces you to use it, though, since the integration is just an HTTP Request node posting to /api/process plus a Webhook trigger.',
+    },
+    {
+      q: 'Do automated API calls cost more than using the dashboard?',
+      a: 'No. API and MCP usage draws from the same minute balance as the dashboard with no per-call pricing: 20 free minutes a month on the hosted free tier, flat paid plans from $12/month, and no meter at all on the self-hosted edition.',
+    },
+  ])}
 
 ${sources([
-  `Webhook signing implementation in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-  'Competitor API metering checked 2026-08-04 on public pricing and developer documentation.',
-])}
+    `Webhook signing implementation in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+    'Competitor API metering checked 2026-08-04 on public pricing and developer documentation.',
+  ])}
 `,
   faq: [
     {
@@ -1476,28 +1470,28 @@ documented on the <a href="/mcp">MCP server and API page</a>, and the raw REST
 loop on the <a href="/automate-shorts-api">automation page</a>.</p>
 
 ${faqBlock([
-  {
-    q: 'Is there a free n8n template to turn long videos into shorts?',
-    a: 'Yes. VideoShorts publishes an MIT-licensed n8n workflow that clips a YouTube channel automatically and posts the approved clips to TikTok, Instagram and YouTube. The JSON is in the project repository with no email gate, and the clipper behind it is open source, so it can run entirely on your own hardware.',
-  },
-  {
-    q: 'How do I post a video to TikTok or Instagram from n8n?',
-    a: 'Neither platform has a native n8n node, and both have hard requirements: TikTok needs an audited app for public posts and Instagram needs a public static URL for the media. Posting through the VideoShorts API avoids both, because the accounts are connected once in your VideoShorts account and the clip already lives on durable public storage.',
-  },
-  {
-    q: 'Does the workflow poll for the clipping job to finish?',
-    a: 'No. Clipping a real video takes minutes, so the workflow passes a webhook_url with the job and VideoShorts calls it exactly once when the job reaches a terminal state. Failed jobs fire the same webhook with an error field, so the flow never hangs.',
-  },
-  {
-    q: 'Can the clips publish without me approving them?',
-    a: 'They can, by connecting the posting step directly to the webhook branch, but the template ships with the approval gate on purpose: unreviewed automated publishing is what YouTube\'s inauthentic-content policy targets, and one bad clip lands on your own audience.',
-  },
-])}
+    {
+      q: 'Is there a free n8n template to turn long videos into shorts?',
+      a: 'Yes. VideoShorts publishes an MIT-licensed n8n workflow that clips a YouTube channel automatically and posts the approved clips to TikTok, Instagram and YouTube. The JSON is in the project repository with no email gate, and the clipper behind it is open source, so it can run entirely on your own hardware.',
+    },
+    {
+      q: 'How do I post a video to TikTok or Instagram from n8n?',
+      a: 'Neither platform has a native n8n node, and both have hard requirements: TikTok needs an audited app for public posts and Instagram needs a public static URL for the media. Posting through the VideoShorts API avoids both, because the accounts are connected once in your VideoShorts account and the clip already lives on durable public storage.',
+    },
+    {
+      q: 'Does the workflow poll for the clipping job to finish?',
+      a: 'No. Clipping a real video takes minutes, so the workflow passes a webhook_url with the job and VideoShorts calls it exactly once when the job reaches a terminal state. Failed jobs fire the same webhook with an error field, so the flow never hangs.',
+    },
+    {
+      q: 'Can the clips publish without me approving them?',
+      a: 'They can, by connecting the posting step directly to the webhook branch, but the template ships with the approval gate on purpose: unreviewed automated publishing is what YouTube\'s inauthentic-content policy targets, and one bad clip lands on your own audience.',
+    },
+  ])}
 
 ${sources([
-  `Workflow JSON and setup notes in the project repository at <a href="${SITE.repo}/tree/main/examples/n8n" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-  'TikTok and Instagram publishing constraints checked against their developer documentation, August 2026.',
-])}
+    `Workflow JSON and setup notes in the project repository at <a href="${SITE.repo}/tree/main/examples/n8n" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+    'TikTok and Instagram publishing constraints checked against their developer documentation, August 2026.',
+  ])}
 `,
   faq: [
     {
@@ -1646,32 +1640,32 @@ ${pricingParagraph('mcp')}
 balance as the dashboard, so automation does not change the price of anything.</p>
 
 ${faqBlock([
-  {
-    q: 'Does VideoShorts have an MCP server?',
-    a: 'Yes, a native one at mcp.videoshorts.app/mcp using the Streamable HTTP transport. It exposes eight tools covering the full pipeline: process_video, create_upload, get_job_status, list_clips, get_quota, add_subtitles, recut_clip and publish_clip. Authentication is an API key created in the dashboard, sent as a Bearer token.',
-  },
-  {
-    q: 'Can Claude or ChatGPT create video clips with VideoShorts?',
-    a: 'Yes. Any MCP-capable client, including Claude and ChatGPT, can connect to mcp.videoshorts.app/mcp with an API key and drive the whole flow: submit a video URL, wait for processing, list the generated clips and publish them to TikTok, Instagram, YouTube, Facebook, LinkedIn, Threads or Bluesky.',
-  },
-  {
-    q: 'Is there an API for VideoShorts?',
-    a: 'Yes, a REST API documented at api.videoshorts.app/docs, authenticated with per-user osk_ keys created in the dashboard. It covers processing, status, subtitles, publishing and completion webhooks.',
-  },
-  {
-    q: 'Do API calls cost extra?',
-    a: 'No. API and MCP usage draws from the same minute balance as the dashboard: 20 free minutes a month on the hosted free tier, and paid plans from $12/month. The self-hosted edition is free under MIT and serves the same endpoints with no metering. Most competing APIs are billed per source minute or per operation on top of a subscription.',
-  },
-  {
-    q: 'How is this different from the Opus Clip MCP server?',
-    a: 'The tool surface is similar: both expose around six tools covering processing, captions and publishing. The differences are billing and deployment. Opus Clip meters MCP usage in credits per source minute, and those credits expire in 60 days; VideoShorts draws from a flat minute balance with no per-call pricing. And only VideoShorts can run the same MCP server on your own machine, unmetered, because the code is MIT-licensed.',
-  },
-])}
+    {
+      q: 'Does VideoShorts have an MCP server?',
+      a: 'Yes, a native one at mcp.videoshorts.app/mcp using the Streamable HTTP transport. It exposes eight tools covering the full pipeline: process_video, create_upload, get_job_status, list_clips, get_quota, add_subtitles, recut_clip and publish_clip. Authentication is an API key created in the dashboard, sent as a Bearer token.',
+    },
+    {
+      q: 'Can Claude or ChatGPT create video clips with VideoShorts?',
+      a: 'Yes. Any MCP-capable client, including Claude and ChatGPT, can connect to mcp.videoshorts.app/mcp with an API key and drive the whole flow: submit a video URL, wait for processing, list the generated clips and publish them to TikTok, Instagram, YouTube, Facebook, LinkedIn, Threads or Bluesky.',
+    },
+    {
+      q: 'Is there an API for VideoShorts?',
+      a: 'Yes, a REST API documented at api.videoshorts.app/docs, authenticated with per-user osk_ keys created in the dashboard. It covers processing, status, subtitles, publishing and completion webhooks.',
+    },
+    {
+      q: 'Do API calls cost extra?',
+      a: 'No. API and MCP usage draws from the same minute balance as the dashboard: 20 free minutes a month on the hosted free tier, and paid plans from $12/month. The self-hosted edition is free under MIT and serves the same endpoints with no metering. Most competing APIs are billed per source minute or per operation on top of a subscription.',
+    },
+    {
+      q: 'How is this different from the Opus Clip MCP server?',
+      a: 'The tool surface is similar: both expose around six tools covering processing, captions and publishing. The differences are billing and deployment. Opus Clip meters MCP usage in credits per source minute, and those credits expire in 60 days; VideoShorts draws from a flat minute balance with no per-call pricing. And only VideoShorts can run the same MCP server on your own machine, unmetered, because the code is MIT-licensed.',
+    },
+  ])}
 
 ${sources([
-  `MCP specification and transports at <a href="https://modelcontextprotocol.io" rel="noopener">modelcontextprotocol.io</a>.`,
-  `VideoShorts server implementation in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+    `MCP specification and transports at <a href="https://modelcontextprotocol.io" rel="noopener">modelcontextprotocol.io</a>.`,
+    `VideoShorts server implementation in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+  ])}
 `,
   faq: [
     {
@@ -1831,10 +1825,10 @@ from the same flat minute balance as the dashboard.</p>
 <h2>What would Opus Clip cost you?</h2>
 <p>Three common creators, priced on the credit rule above (one credit per source minute):</p>
 ${factTiles([
-  { k: 'One 20-min video a week', v: '~87 min', s: 'Fits Starter at $15/month' },
-  { k: 'Weekly 60-min podcast', v: '~260 min', s: 'Needs Pro: $29/month, or $14.50 yearly' },
-  { k: 'Daily 30-min stream', v: '~900 min', s: 'Past two Pro packs: Business, custom price' },
-])}
+    { k: 'One 20-min video a week', v: '~87 min', s: 'Fits Starter at $15/month' },
+    { k: 'Weekly 60-min podcast', v: '~260 min', s: 'Needs Pro: $29/month, or $14.50 yearly' },
+    { k: 'Daily 30-min stream', v: '~900 min', s: 'Past two Pro packs: Business, custom price' },
+  ])}
 <p>For any other number, the calculator in <a href="#pro">the Pro section</a>
 prices your own monthly minutes plan by plan.</p>
 
@@ -1855,9 +1849,9 @@ ${pricingParagraph('meter')}
 ${faqBlock(OPUS_PRICING_FAQ)}
 
 ${sources([
-  `${esc(OPUS.name)} plans, trial and credit rules checked ${esc(OPUS.checked)} on opus.pro/pricing and the OpusClip help centre (how credits are consumed, free trial, watermark).`,
-  `VideoShorts pricing from <a href="/alternatives/opus-clip">the full comparison</a> and the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+    `${esc(OPUS.name)} plans, trial and credit rules checked ${esc(OPUS.checked)} on opus.pro/pricing and the OpusClip help centre (how credits are consumed, free trial, watermark).`,
+    `VideoShorts pricing from <a href="/alternatives/opus-clip">the full comparison</a> and the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+  ])}
 `,
   faq: OPUS_PRICING_FAQ,
 })
@@ -2010,28 +2004,28 @@ opus.pro.</p></div>
 <p>It takes a long video, finds the segments worth keeping, cuts them, reframes
 them and burns in animated captions. The features its users cite:</p>
 ${li([
-  'ClipAnything, which picks moments from visual, audio and sentiment cues, so it works on footage with little dialogue, and takes a prompt for what to look for.',
-  'ReframeAnything (alpha), which tracks a subject and reframes to 9:16, 1:1 or 16:9.',
-  'A virality score from 0 to 99 built from hook, flow, value and trend, shown on paid plans only.',
-  'Animated captions in 20+ languages, AI B-roll, dubbing, a scheduler, and an API on Pro and Business.',
-])}
+    'ClipAnything, which picks moments from visual, audio and sentiment cues, so it works on footage with little dialogue, and takes a prompt for what to look for.',
+    'ReframeAnything (alpha), which tracks a subject and reframes to 9:16, 1:1 or 16:9.',
+    'A virality score from 0 to 99 built from hook, flow, value and trend, shown on paid plans only.',
+    'Animated captions in 20+ languages, AI B-roll, dubbing, a scheduler, and an API on Pro and Business.',
+  ])}
 <p>It is cloud only: there is no self-hosted edition and no source to read. It
 accepts sources up to 10 hours long.</p>
 
 <h2>How the workflow compares</h2>
 ${flowCompare(
-  {
-    title: 'Opus AI (OpusClip)',
-    steps: [
-      'Upload a file or paste a YouTube link',
-      'ClipAnything proposes clips with a virality score',
-      { text: 'Choose the clips worth keeping' },
-      { text: 'Adjust captions, B-roll and framing' },
-      'Export, or schedule to connected accounts',
-    ],
-  },
-  OS_LANE
-)}
+    {
+      title: 'Opus AI (OpusClip)',
+      steps: [
+        'Upload a file or paste a YouTube link',
+        'ClipAnything proposes clips with a virality score',
+        { text: 'Choose the clips worth keeping' },
+        { text: 'Adjust captions, B-roll and framing' },
+        'Export, or schedule to connected accounts',
+      ],
+    },
+    OS_LANE
+  )}
 
 <h2>Is Opus AI free?</h2>
 <p>Yes, to a point. The free plan gives 60 credits a month, one per minute of
@@ -2048,11 +2042,11 @@ and what the Pro plan adds are on the
 
 <h2>Where VideoShorts differs</h2>
 ${li([
-  'VideoShorts is MIT-licensed and can be self-hosted with Docker, so the source video never leaves your machine. Opus is cloud only.',
-  'VideoShorts self-hosted has no meter of any kind. Opus bills credits per minute of source imported, and monthly credits expire after 60 days.',
-  'VideoShorts Cloud starts at $12/month for 100 minutes with no watermark; the hosted free plan clips your first video free up to 60 minutes, then 20 minutes a month.',
-  'Opus has the larger caption-style library and a longer track record. If your clips live or die on animated caption design, that advantage is real.',
-])}
+    'VideoShorts is MIT-licensed and can be self-hosted with Docker, so the source video never leaves your machine. Opus is cloud only.',
+    'VideoShorts self-hosted has no meter of any kind. Opus bills credits per minute of source imported, and monthly credits expire after 60 days.',
+    'VideoShorts Cloud starts at $12/month for 100 minutes with no watermark; the hosted free plan clips your first video free up to 60 minutes, then 20 minutes a month.',
+    'Opus has the larger caption-style library and a longer track record. If your clips live or die on animated caption design, that advantage is real.',
+  ])}
 
 <h2>What the open source alternative produces</h2>
 ${demoBlock()}
@@ -2063,9 +2057,9 @@ ${pricingParagraph('brand')}
 ${faqBlock(OPUS_AI_FAQ)}
 
 ${sources([
-  `OpusClip plans, features and limits checked ${esc(OPUS.checked)} on opus.pro, opus.pro/pricing and help.opus.pro; Agent Opus credits on the Agent Opus credits FAQ.`,
-  `VideoShorts pipeline in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+    `OpusClip plans, features and limits checked ${esc(OPUS.checked)} on opus.pro, opus.pro/pricing and help.opus.pro; Agent Opus credits on the Agent Opus credits FAQ.`,
+    `VideoShorts pipeline in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+  ])}
 `,
   faq: OPUS_AI_FAQ,
 })
@@ -2198,9 +2192,9 @@ ${pricingParagraph('brand')}
 ${faqBlock(faq)}
 
 ${sources([
-  `Vizard plans, free-plan limits and transcript formats checked ${esc(c.checked)} on vizard.ai/pricing and vizard.ai/tools/video-to-text; API limits on docs.vizard.ai.`,
-  'Pros, cons and fit are our reading of the published plans and the product as offered; we do not publish an aggregate star rating for a competitor.',
-])}
+      `Vizard plans, free-plan limits and transcript formats checked ${esc(c.checked)} on vizard.ai/pricing and vizard.ai/tools/video-to-text; API limits on docs.vizard.ai.`,
+      'Pros, cons and fit are our reading of the published plans and the product as offered; we do not publish an aggregate star rating for a competitor.',
+    ])}
 `,
     faq,
   }
@@ -2288,24 +2282,24 @@ by-product of clipping at volume, or you need the transcript to stay on your own
 machine, self-hosted VideoShorts is free and the transcript comes with the job.</p>
 
 ${faqBlock([
-  {
-    q: 'Does Vizard AI convert video to text?',
-    a: `Yes. It transcribes the video and gives you the text alongside the clips and subtitles, from a YouTube link or an upload. The free plan (60 credits a month) downloads it as TXT; paid plans, from ${c.entryPrice}, add SRT.`,
-  },
-  {
-    q: 'How do I get a free transcript from a video?',
-    a: 'Self-host VideoShorts: transcription runs locally with faster-whisper at word level and the transcript comes back with the finished job, at no cost and with no watermark. The self-hosted edition needs Docker and a Google Gemini API key for the moment scoring, whose free tier covers 1,500 requests a day.',
-  },
-  {
-    q: 'Is word-level timing important in a transcript?',
-    a: 'For subtitles, yes. Sentence-level timestamps force captions to appear for the whole sentence at once, which is where the timing drifts out of sync with the speech. Word-level timestamps let each caption start and end on the word being spoken, and they are also what lets a clip boundary land mid-sentence without cutting a word in half.',
-  },
-])}
+      {
+        q: 'Does Vizard AI convert video to text?',
+        a: `Yes. It transcribes the video and gives you the text alongside the clips and subtitles, from a YouTube link or an upload. The free plan (60 credits a month) downloads it as TXT; paid plans, from ${c.entryPrice}, add SRT.`,
+      },
+      {
+        q: 'How do I get a free transcript from a video?',
+        a: 'Self-host VideoShorts: transcription runs locally with faster-whisper at word level and the transcript comes back with the finished job, at no cost and with no watermark. The self-hosted edition needs Docker and a Google Gemini API key for the moment scoring, whose free tier covers 1,500 requests a day.',
+      },
+      {
+        q: 'Is word-level timing important in a transcript?',
+        a: 'For subtitles, yes. Sentence-level timestamps force captions to appear for the whole sentence at once, which is where the timing drifts out of sync with the speech. Word-level timestamps let each caption start and end on the word being spoken, and they are also what lets a clip boundary land mid-sentence without cutting a word in half.',
+      },
+    ])}
 
 ${sources([
-  `Vizard plan limits checked ${esc(c.checked)} on the vendor's public pricing page.`,
-  `VideoShorts transcription and subtitle stages in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+      `Vizard plan limits checked ${esc(c.checked)} on the vendor's public pricing page.`,
+      `VideoShorts transcription and subtitle stages in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+    ])}
 `,
     faq: [
       {
@@ -2383,18 +2377,18 @@ recommendation is straightforward and it is not ours.</p>
 
 <h2>How the workflow compares</h2>
 ${flowCompare(
-  {
-    title: 'Submagic',
-    steps: [
-      'Upload a video or paste a link',
-      'Captions transcribed and styled',
-      'Optional: Magic Clips cuts a long video into clips',
-      { text: 'Pick a template, B-roll and zooms' },
-      { text: 'Export each video' },
-    ],
-  },
-  OS_LANE
-)}
+      {
+        title: 'Submagic',
+        steps: [
+          'Upload a video or paste a link',
+          'Captions transcribed and styled',
+          'Optional: Magic Clips cuts a long video into clips',
+          { text: 'Pick a template, B-roll and zooms' },
+          { text: 'Export each video' },
+        ],
+      },
+      OS_LANE
+    )}
 
 <h2>Where it is weaker</h2>
 <p>${esc(c.gotcha)}</p>
@@ -2438,9 +2432,9 @@ depend on one.</p></div>
 ${faqBlock(faq)}
 
 ${sources([
-  `Submagic plans and limits checked ${esc(c.checked)} on submagic.co/pricing; Magic Clips on submagic.co/features/magic-clips.`,
-  `VideoShorts pipeline stages in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+      `Submagic plans and limits checked ${esc(c.checked)} on submagic.co/pricing; Magic Clips on submagic.co/features/magic-clips.`,
+      `VideoShorts pipeline stages in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+    ])}
 `,
     faq,
   }
@@ -2584,19 +2578,19 @@ medidor de ningún tipo, así que un vídeo de 90 minutos cuesta lo mismo que un
 9, y el vídeo original nunca sale de tu máquina.</p>
 
 ${faqBlock([
-  {
-    q: '¿Cuál es la alternativa gratuita a Opus Clip?',
-    a: 'VideoShorts autoalojado: licencia MIT, se ejecuta con Docker en tu máquina, sin marca de agua y sin límite de uso. Solo necesitas una clave de Google Gemini, cuyo plan gratuito cubre 1.500 peticiones al día. Si prefieres no instalar nada, VideoShorts Cloud da 20 minutos al mes con marca de agua y planes de pago desde $12/mes.',
-  },
-  {
-    q: '¿Qué herramienta de clipping tiene código abierto?',
-    a: 'VideoShorts, con licencia MIT y el código completo en GitHub. Opus Clip, Klap, Vizard, Submagic, Quso (antes Vidyo.ai), 2short y SendShort son productos comerciales de código cerrado que solo funcionan en la nube.',
-  },
-  {
-    q: '¿Merece la pena cambiar de herramienta?',
-    a: 'Depende de lo que más te moleste hoy. Si es el precio por minuto de vídeo de origen, el ahorro es real, sobre todo con episodios largos. Si es el diseño de los subtítulos, las herramientas comerciales siguen teniendo más presets y más pulidos, y eso no lo vamos a discutir.',
-  },
-], { lang: 'es' })}
+      {
+        q: '¿Cuál es la alternativa gratuita a Opus Clip?',
+        a: 'VideoShorts autoalojado: licencia MIT, se ejecuta con Docker en tu máquina, sin marca de agua y sin límite de uso. Solo necesitas una clave de Google Gemini, cuyo plan gratuito cubre 1.500 peticiones al día. Si prefieres no instalar nada, VideoShorts Cloud da 20 minutos al mes con marca de agua y planes de pago desde $12/mes.',
+      },
+      {
+        q: '¿Qué herramienta de clipping tiene código abierto?',
+        a: 'VideoShorts, con licencia MIT y el código completo en GitHub. Opus Clip, Klap, Vizard, Submagic, Quso (antes Vidyo.ai), 2short y SendShort son productos comerciales de código cerrado que solo funcionan en la nube.',
+      },
+      {
+        q: '¿Merece la pena cambiar de herramienta?',
+        a: 'Depende de lo que más te moleste hoy. Si es el precio por minuto de vídeo de origen, el ahorro es real, sobre todo con episodios largos. Si es el diseño de los subtítulos, las herramientas comerciales siguen teniendo más presets y más pulidos, y eso no lo vamos a discutir.',
+      },
+    ], { lang: 'es' })}
 `,
     faq: [
       {
@@ -2747,34 +2741,34 @@ another streamer's clips without permission is the one case that is clearly not
 fine, and the platforms strike it.</p>
 
 ${faqBlock([
-  {
-    q: 'How do I make GTA 5 clips for TikTok?',
-    a: 'Paste the stream VOD link into VideoShorts with the vertical layout set to auto. It transcribes the whole recording, has Gemini pick the 3 to 15 strongest 15 to 60 second moments out of what was said, reframes each one to 9:16 keeping the gameplay full width with your facecam enlarged below it, and burns in word-level subtitles. Clips download or post straight to TikTok, Reels and Shorts.',
-  },
-  {
-    q: 'Can it handle a whole eight-hour GTA RP stream?',
-    a: 'Yes, long sources are the design case. Moment scoring reads the transcript rather than the raw video, so an eight-hour VOD does not degrade selection the way it degrades a frame-by-frame approach. Processing time scales with length: the GPU-backed hosted edition clips about 8 minutes of source in 50 seconds, and self-hosted on CPU it is roughly 5 to 8 minutes of processing per 8 minutes of source.',
-  },
-  {
-    q: 'Does it keep my facecam in the clip?',
-    a: 'Yes, when the layout picker is on auto. A webcam box composited into a corner is detected geometrically (small, off centre horizontally, static between samples) and the clip renders as INSET: gameplay at full width on top, the webcam cropped out and enlarged underneath, so both are legible on a phone.',
-  },
-  {
-    q: 'Does it work on gameplay with no commentary?',
-    a: 'Yes, and it switches by itself. Footage with no audio track, or whose transcript comes back under 8 words or under 5 words per minute, goes down a vision pass instead: Gemini watches the footage and returns the same 3 to 15 moments, with the same layouts and inset detection after it. The clips come out without captions, since there is no speech to caption. A long silent capture is watched in stretches of up to 40 minutes, up to a little over five hours per job; giving it only the session you care about costs fewer minutes.',
-  },
-  {
-    q: 'Is it free for streamers?',
-    a: 'Self-hosted VideoShorts is free and open source under MIT with no per-minute meter, which is the edition that makes sense when your sources are measured in hours: run it with Docker and bring your own Gemini API key. VideoShorts Cloud covers 20 minutes a month free with a watermark, and paid hosted plans start at $12/month.',
-  },
-])}
+    {
+      q: 'How do I make GTA 5 clips for TikTok?',
+      a: 'Paste the stream VOD link into VideoShorts with the vertical layout set to auto. It transcribes the whole recording, has Gemini pick the 3 to 15 strongest 15 to 60 second moments out of what was said, reframes each one to 9:16 keeping the gameplay full width with your facecam enlarged below it, and burns in word-level subtitles. Clips download or post straight to TikTok, Reels and Shorts.',
+    },
+    {
+      q: 'Can it handle a whole eight-hour GTA RP stream?',
+      a: 'Yes, long sources are the design case. Moment scoring reads the transcript rather than the raw video, so an eight-hour VOD does not degrade selection the way it degrades a frame-by-frame approach. Processing time scales with length: the GPU-backed hosted edition clips about 8 minutes of source in 50 seconds, and self-hosted on CPU it is roughly 5 to 8 minutes of processing per 8 minutes of source.',
+    },
+    {
+      q: 'Does it keep my facecam in the clip?',
+      a: 'Yes, when the layout picker is on auto. A webcam box composited into a corner is detected geometrically (small, off centre horizontally, static between samples) and the clip renders as INSET: gameplay at full width on top, the webcam cropped out and enlarged underneath, so both are legible on a phone.',
+    },
+    {
+      q: 'Does it work on gameplay with no commentary?',
+      a: 'Yes, and it switches by itself. Footage with no audio track, or whose transcript comes back under 8 words or under 5 words per minute, goes down a vision pass instead: Gemini watches the footage and returns the same 3 to 15 moments, with the same layouts and inset detection after it. The clips come out without captions, since there is no speech to caption. A long silent capture is watched in stretches of up to 40 minutes, up to a little over five hours per job; giving it only the session you care about costs fewer minutes.',
+    },
+    {
+      q: 'Is it free for streamers?',
+      a: 'Self-hosted VideoShorts is free and open source under MIT with no per-minute meter, which is the edition that makes sense when your sources are measured in hours: run it with Docker and bring your own Gemini API key. VideoShorts Cloud covers 20 minutes a month free with a watermark, and paid hosted plans start at $12/month.',
+    },
+  ])}
 
 ${sources([
-  'Opus Clip tier minutes and prices checked 2026-07-27 on their public pricing page.',
-  'Inset detection and layout accuracy figures are our own measurements on a 48-video internal corpus, 2026-08.',
-  'Silent-footage thresholds (8 words, 5 words per minute) and the vision fallback are in <code>main.py</code>; Gemini video token rates from Google\'s published pricing.',
-  `Inset, WIDE and screencast layout implementations in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+    'Opus Clip tier minutes and prices checked 2026-07-27 on their public pricing page.',
+    'Inset detection and layout accuracy figures are our own measurements on a 48-video internal corpus, 2026-08.',
+    'Silent-footage thresholds (8 words, 5 words per minute) and the vision fallback are in <code>main.py</code>; Gemini video token rates from Google\'s published pricing.',
+    `Inset, WIDE and screencast layout implementations in the project source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+  ])}
 
 ${trademarkNote('Grand Theft Auto, GTA, Rockstar Games and Twitch', 'Rockstar Games, Take-Two Interactive or Twitch')}
 `,
@@ -3141,14 +3135,14 @@ ${qaSections(gta6Qa)}
 </ul>
 
 ${sources([
-  `Launch date: Rockstar Games Newswire, <a href="${ROCKSTAR_LAUNCH_URL}" rel="noopener">"Grand Theft Auto VI is Now Set to Launch November 19, 2026"</a>. Platforms: Rockstar Support, <a href="${ROCKSTAR_TIMES_URL}" rel="noopener">GTA VI pre-load and release times on PlayStation 5 and Xbox Series X|S</a>. Both checked ${GTA6_CHECKED}.`,
-  `Video policy: Rockstar Support, <a href="${ROCKSTAR_POLICY_URL}" rel="noopener">Policy on posting copyrighted Rockstar Games material</a>, checked ${GTA6_CHECKED}.`,
-  `PS5 capture: PlayStation Support, <a href="${PS5_CAPTURE_URL}" rel="noopener">How to capture gameplay and screenshots on PS5 consoles</a>, <a href="${PS5_APP_URL}" rel="noopener">How to access PS5 game captures on PS App</a> and <a href="${PS5_GALLERY_URL}" rel="noopener">How to view screenshots and video clips on PS5 consoles</a>, checked ${GAMING_CHECKED}.`,
-  `Xbox capture: Xbox Support, <a href="${XBOX_SHARE_URL}" rel="noopener">What's this Share button on my controller?</a>, and Xbox Wire, <a href="${XBOX_ONEDRIVE_URL}" rel="noopener">captures to OneDrive</a> (27 September 2023), checked ${GAMING_CHECKED}.`,
-  `Platform lengths: <a href="${YT_SHORTS_URL}" rel="noopener">YouTube Help: Upload YouTube Shorts</a> (up to 3 minutes), checked 28 October 2026; Instagram Reels up to 3 minutes, announced January 2025, reported by <a href="${REELS_URL}" rel="noopener">Social Media Today</a>.`,
-  'Silent-footage thresholds (8 words, 5 words per minute) and the stretches of the vision pass: <code>main.py</code> and <code>clip_selection.py</code>; inset detection: <code>camera_inset.py</code>; WIDE layout: <code>screencast_layout.py</code>.',
-  `VideoShorts plan minutes: <a href="/pricing">pricing</a>. Source: <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+    `Launch date: Rockstar Games Newswire, <a href="${ROCKSTAR_LAUNCH_URL}" rel="noopener">"Grand Theft Auto VI is Now Set to Launch November 19, 2026"</a>. Platforms: Rockstar Support, <a href="${ROCKSTAR_TIMES_URL}" rel="noopener">GTA VI pre-load and release times on PlayStation 5 and Xbox Series X|S</a>. Both checked ${GTA6_CHECKED}.`,
+    `Video policy: Rockstar Support, <a href="${ROCKSTAR_POLICY_URL}" rel="noopener">Policy on posting copyrighted Rockstar Games material</a>, checked ${GTA6_CHECKED}.`,
+    `PS5 capture: PlayStation Support, <a href="${PS5_CAPTURE_URL}" rel="noopener">How to capture gameplay and screenshots on PS5 consoles</a>, <a href="${PS5_APP_URL}" rel="noopener">How to access PS5 game captures on PS App</a> and <a href="${PS5_GALLERY_URL}" rel="noopener">How to view screenshots and video clips on PS5 consoles</a>, checked ${GAMING_CHECKED}.`,
+    `Xbox capture: Xbox Support, <a href="${XBOX_SHARE_URL}" rel="noopener">What's this Share button on my controller?</a>, and Xbox Wire, <a href="${XBOX_ONEDRIVE_URL}" rel="noopener">captures to OneDrive</a> (27 September 2023), checked ${GAMING_CHECKED}.`,
+    `Platform lengths: <a href="${YT_SHORTS_URL}" rel="noopener">YouTube Help: Upload YouTube Shorts</a> (up to 3 minutes), checked 28 October 2026; Instagram Reels up to 3 minutes, announced January 2025, reported by <a href="${REELS_URL}" rel="noopener">Social Media Today</a>.`,
+    'Silent-footage thresholds (8 words, 5 words per minute) and the stretches of the vision pass: <code>main.py</code> and <code>clip_selection.py</code>; inset detection: <code>camera_inset.py</code>; WIDE layout: <code>screencast_layout.py</code>.',
+    `VideoShorts plan minutes: <a href="/pricing">pricing</a>. Source: <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+  ])}
 ${trademarkNote('Grand Theft Auto, GTA, Rockstar Games, PlayStation, Xbox and Twitch', 'Rockstar Games, Take-Two Interactive, Sony, Microsoft or Twitch')}
 `,
   faq: qaFaq(gta6Qa),
@@ -3336,14 +3330,14 @@ ${qaSections(wowQa)}
 </ul>
 
 ${sources([
-  `Launch times, raids (9 December 2026) and Hardcore after launch: Blizzard News, <a href="${WOW_LAUNCH_URL}" rel="noopener">"World of Warcraft: Forever Goes Live Globally November 4!"</a>; included with a subscription or game time: Blizzard, <a href="${WOW_ANNOUNCE_URL}" rel="noopener">"Carve a New Path with World of Warcraft: Forever"</a> (12 September 2026). Both checked ${WOW_CHECKED}.`,
-  `Platforms (Windows, macOS) and Hardcore in winter 2026/2027: <a href="${WOW_WIKI_URL}" rel="noopener">warcraft.wiki.gg, Forever</a>; Hardcore by winter: <a href="${WOW_HARDCORE_URL}" rel="noopener">PC Gamer</a>; BlizzCon announcement: <a href="${WOW_SHACK_URL}" rel="noopener">Shacknews</a> (12 September 2026). Checked ${WOW_CHECKED}.`,
-  `Video policy: <a href="${BLIZZARD_POLICY_URL}" rel="noopener">Blizzard Video Policy</a>, checked ${WOW_CHECKED}.`,
-  `Recorders: <a href="${WOW_RECORDER_URL}" rel="noopener">Warcraft Recorder README</a> (supported flavours and OS, GPL-2.0); <a href="${OBS_REPLAY_URL}" rel="noopener">OBS forum guide to the replay buffer</a>; <a href="${AMD_REPLAY_URL}" rel="noopener">AMD support article DH3-023</a> (Instant Replay); <a href="${GAME_BAR_URL}" rel="noopener">Microsoft: Xbox Game Bar shortcuts</a>; <a href="${MAC_RECORD_URL}" rel="noopener">Apple: How to record the screen on Mac</a>. All checked ${WOW_CHECKED}.`,
-  `Platform lengths: <a href="${YT_SHORTS_URL}" rel="noopener">YouTube Help: Upload YouTube Shorts</a>, checked 28 October 2026; Instagram Reels up to 3 minutes, reported by <a href="${REELS_URL}" rel="noopener">Social Media Today</a>.`,
-  'Silent-footage thresholds and stretches: <code>main.py</code> and <code>clip_selection.py</code>; inset detection: <code>camera_inset.py</code>; WIDE layout: <code>screencast_layout.py</code>.',
-  `VideoShorts plan minutes: <a href="/pricing">pricing</a>. Source: <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+    `Launch times, raids (9 December 2026) and Hardcore after launch: Blizzard News, <a href="${WOW_LAUNCH_URL}" rel="noopener">"World of Warcraft: Forever Goes Live Globally November 4!"</a>; included with a subscription or game time: Blizzard, <a href="${WOW_ANNOUNCE_URL}" rel="noopener">"Carve a New Path with World of Warcraft: Forever"</a> (12 September 2026). Both checked ${WOW_CHECKED}.`,
+    `Platforms (Windows, macOS) and Hardcore in winter 2026/2027: <a href="${WOW_WIKI_URL}" rel="noopener">warcraft.wiki.gg, Forever</a>; Hardcore by winter: <a href="${WOW_HARDCORE_URL}" rel="noopener">PC Gamer</a>; BlizzCon announcement: <a href="${WOW_SHACK_URL}" rel="noopener">Shacknews</a> (12 September 2026). Checked ${WOW_CHECKED}.`,
+    `Video policy: <a href="${BLIZZARD_POLICY_URL}" rel="noopener">Blizzard Video Policy</a>, checked ${WOW_CHECKED}.`,
+    `Recorders: <a href="${WOW_RECORDER_URL}" rel="noopener">Warcraft Recorder README</a> (supported flavours and OS, GPL-2.0); <a href="${OBS_REPLAY_URL}" rel="noopener">OBS forum guide to the replay buffer</a>; <a href="${AMD_REPLAY_URL}" rel="noopener">AMD support article DH3-023</a> (Instant Replay); <a href="${GAME_BAR_URL}" rel="noopener">Microsoft: Xbox Game Bar shortcuts</a>; <a href="${MAC_RECORD_URL}" rel="noopener">Apple: How to record the screen on Mac</a>. All checked ${WOW_CHECKED}.`,
+    `Platform lengths: <a href="${YT_SHORTS_URL}" rel="noopener">YouTube Help: Upload YouTube Shorts</a>, checked 28 October 2026; Instagram Reels up to 3 minutes, reported by <a href="${REELS_URL}" rel="noopener">Social Media Today</a>.`,
+    'Silent-footage thresholds and stretches: <code>main.py</code> and <code>clip_selection.py</code>; inset detection: <code>camera_inset.py</code>; WIDE layout: <code>screencast_layout.py</code>.',
+    `VideoShorts plan minutes: <a href="/pricing">pricing</a>. Source: <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+  ])}
 ${trademarkNote('World of Warcraft, Warcraft, Blizzard and Twitch', 'Blizzard Entertainment, Microsoft or Twitch')}
 `,
   faq: qaFaq(wowQa),
@@ -3453,9 +3447,9 @@ ${tiers(v)}
 ${faqBlock(faq)}
 
 ${sources([
-  `OpusClip plans checked ${esc(o.checked)} on opus.pro/pricing; Vizard plans checked ${esc(v.checked)} on vizard.ai/pricing.`,
-  `VideoShorts plans: <a href="/pricing">pricing</a>; source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
-])}
+      `OpusClip plans checked ${esc(o.checked)} on opus.pro/pricing; Vizard plans checked ${esc(v.checked)} on vizard.ai/pricing.`,
+      `VideoShorts plans: <a href="/pricing">pricing</a>; source at <a href="${SITE.repo}" rel="noopener">github.com/mutonby/videoshorts</a>.`,
+    ])}
 `,
     faq,
   }
@@ -3522,7 +3516,6 @@ export function buildPages() {
     automateShorts(),
     n8nTemplate(),
     opusVsVizard(),
-    pricingPage(),
   ].map((p) => ({
     ...p,
     related: p.related || RELATED[p.path],

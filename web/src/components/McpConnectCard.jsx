@@ -8,7 +8,7 @@ import { getApiUrl } from '../config';
 // an API key); a self-hosted install has no auth, so every snippet is the
 // local URL and nothing else.
 
-const CLOUD_MCP_URL = 'https://mcp.videoshorts.app/mcp';
+const CLOUD_MCP_URL = 'https://mcp.videoshorts.local/mcp';
 
 // The self-hosted dashboard proxies /api and /videos to the backend but not
 // /mcp (neither the Vite dev proxy nor nginx.conf), so an MCP client must

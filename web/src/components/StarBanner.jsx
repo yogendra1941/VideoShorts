@@ -1,6 +1,6 @@
 import { Github } from 'lucide-react';
 
-export const REPO_URL = 'https://github.com/mutonby/videoshorts';
+export const REPO_URL = 'https://github.com/yogendra1941/VideoShorts';
 
 // Small "star us" ask, once per job, while the clips render: that wait is the
 // only dead time in the flow. Asking again on the finished clips made it two
