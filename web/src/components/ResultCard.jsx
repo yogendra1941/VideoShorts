@@ -67,6 +67,18 @@ export default function ResultCard({
     onModeChanged = null,
     onPlay = null,
     onPause = null,
+    initialState = null,
+    onStateChange = null,
+    connectedPlatforms = [],
+    onConnectSocials = null,
+    geminiApiKey = '',
+    isManaged = false,
+    uploadPostKey = '',
+    uploadUserId = '',
+    onBulkSubtitle = null,
+    clipCount = 1,
+    bulkProgress = null,
+    elevenLabsKey = '',
 }) {
     const [showModal, setShowModal] = useState(false);
     const whyRef = useRef(null);

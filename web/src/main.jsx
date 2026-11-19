@@ -1,14 +1,70 @@
-import { StrictMode, lazy, Suspense, useState, useEffect } from 'react'
+import React, { StrictMode, Component, lazy, Suspense, useState, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import App from './App.jsx'
 import { AuthProvider } from './contexts/AuthContext'
 import { capture as captureAttribution } from './lib/attribution'
 import { applyConsent } from './lib/consent'
 
-// VideoShorts is a 100% free studio app: the root view is the studio itself,
-// no marketing landing, no pricing, no sign-in walls.
-const App = lazy(() => import('./App.jsx'))
 const OAuthConsent = lazy(() => import('./components/OAuthConsent'))
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("VideoShorts Studio Runtime Error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#0b0d12] text-slate-200 flex flex-col items-center justify-center p-6 select-none font-sans">
+          <div className="max-w-lg w-full bg-[#131722] border border-red-500/30 rounded-2xl p-6 shadow-2xl space-y-4 text-center">
+            <div className="w-12 h-12 mx-auto rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 text-xl font-bold">
+              !
+            </div>
+            <h2 className="text-xl font-bold text-white font-display">Studio Rendering Error</h2>
+            <p className="text-xs text-slate-400">
+              An unexpected error occurred while rendering the workspace:
+            </p>
+            <div className="p-3 rounded-lg bg-black/60 border border-white/10 font-mono text-left text-xs text-rose-300 overflow-x-auto max-h-40">
+              {this.state.error?.message || String(this.state.error)}
+            </div>
+            <div className="pt-2 flex items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  window.location.hash = '#app';
+                  window.location.reload();
+                }}
+                className="px-4 py-2 rounded-lg bg-accent text-white font-semibold text-xs hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20"
+              >
+                Reload Studio
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.hash = '#app';
+                  window.location.reload();
+                }}
+                className="px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 text-xs hover:bg-slate-700 transition-colors"
+              >
+                Clear Cache & Reload
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function DeletedView() {
   return (
@@ -57,10 +113,12 @@ applyConsent();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthProvider>
-      <Suspense fallback={<div className="min-h-screen bg-paper flex items-center justify-center text-muted text-sm lowercase">loading…</div>}>
-        <Root />
-      </Suspense>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Suspense fallback={<div className="min-h-screen bg-[#0b0d12] flex items-center justify-center text-slate-400 text-sm">Loading VideoShorts Studio…</div>}>
+          <Root />
+        </Suspense>
+      </AuthProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )
