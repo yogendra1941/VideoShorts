@@ -87,12 +87,16 @@ export default function ResultsGrid({
       {/* Grid of Result Cards */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-1">
         {clips.length === 0 ? (
-          <div className="h-64 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-rule rounded-2xl">
-            <Film size={32} className="text-muted/40 mb-3" />
-            <p className="text-sm text-ink font-medium">No clips rendered yet</p>
-            <p className="text-xs text-muted max-w-sm mt-1">
-              Submit a video or URL on the left to extract viral vertical shorts.
+          <div className="h-72 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-rule rounded-2xl bg-paper2/40">
+            <Film size={36} className="text-muted/40 mb-3" />
+            <p className="text-sm text-ink font-semibold">Generated Shorts Output</p>
+            <p className="text-xs text-muted max-w-md mt-1 mb-3">
+              When you paste a YouTube link or upload a video on the left, your extracted vertical shorts will appear here as playable videos with 1-click Download buttons.
             </p>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-paper3 border border-rule text-[11px] font-mono text-muted">
+              <span>Output Directory:</span>
+              <code className="text-accent font-semibold">D:\Video Clips\VideoShorts\output</code>
+            </div>
           </div>
         ) : (
           <div className="grid gap-4 pb-12 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">

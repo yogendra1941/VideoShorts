@@ -15,12 +15,10 @@ import {
 } from 'lucide-react';
 
 export const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Clips Studio', icon: Film, badge: 'Studio' },
+  { id: 'dashboard', label: 'Clips Studio', icon: Film, badge: 'Main' },
   { id: 'subtitles', label: 'Subtitle Lab', icon: Type, badge: '6 Styles' },
   { id: 'thumbnails', label: 'Thumbnail Studio', icon: ImageIcon, badge: 'Viral' },
-  { id: 'autopilot', label: 'Channel Autopilot', icon: Radio, badge: 'Auto' },
-  { id: 'history', label: 'Clip Vault', icon: History },
-  { id: 'agent', label: 'Autonomous Agent', icon: Bot, badge: 'New' },
+  { id: 'history', label: 'Clip Vault', icon: History, badge: 'Storage' },
   { id: 'settings', label: 'Studio Config', icon: Sliders },
 ];
 

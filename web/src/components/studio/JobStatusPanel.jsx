@@ -16,12 +16,12 @@ import {
 import ProcessingAnimation from '../ProcessingAnimation';
 
 const PIPELINE_STAGES = [
-  { id: 'ingest', label: 'Ingest & Audio', icon: Film },
-  { id: 'whisper', label: 'Faster-Whisper ASR', icon: Activity },
-  { id: 'scoring', label: 'Virality Scoring', icon: TrendingUp },
-  { id: 'honesty', label: 'Honesty Gate', icon: Scissors },
-  { id: 'reframe', label: 'Face Tracking', icon: Crosshair },
-  { id: 'render', label: 'NVENC Render', icon: Subtitles },
+  { id: 'ingest', label: '1. Ingest & Audio', engine: 'yt-dlp + ffmpeg', icon: Film },
+  { id: 'whisper', label: '2. Transcription', engine: 'Faster-Whisper CUDA', icon: Activity },
+  { id: 'scoring', label: '3. AI Moment Picker', engine: 'Inception Mercury-3', icon: TrendingUp },
+  { id: 'snapping', label: '4. Silence Snapping', engine: 'OpenShorts VAD Snap', icon: Scissors },
+  { id: 'reframe', label: '5. Face Tracking', engine: 'PySceneDetect + Crop', icon: Crosshair },
+  { id: 'render', label: '6. Subtitles & Render', engine: 'OpenShorts ASS + NVENC', icon: Subtitles },
 ];
 
 export default function JobStatusPanel({
@@ -46,10 +46,10 @@ export default function JobStatusPanel({
   const currentStageIndex = (() => {
     if (status === 'complete') return 6;
     const allText = logs.join(' ').toLowerCase();
-    if (allText.includes('rendering') || allText.includes('nvenc') || allText.includes('subtitle')) return 5;
-    if (allText.includes('reframe') || allText.includes('mediapipe') || allText.includes('tracking')) return 4;
-    if (allText.includes('honesty') || allText.includes('deep clips') || allText.includes('thread')) return 3;
-    if (allText.includes('virality') || allText.includes('scoring') || allText.includes('critic') || allText.includes('hook')) return 2;
+    if (allText.includes('rendering') || allText.includes('nvenc') || allText.includes('subtitle') || allText.includes('ducking')) return 5;
+    if (allText.includes('reframe') || allText.includes('tracking') || allText.includes('face') || allText.includes('layout')) return 4;
+    if (allText.includes('snap') || allText.includes('pause') || allText.includes('silence') || allText.includes('trimming')) return 3;
+    if (allText.includes('virality') || allText.includes('scoring') || allText.includes('evaluat') || allText.includes('critic') || allText.includes('moment')) return 2;
     if (allText.includes('transcrib') || allText.includes('whisper')) return 1;
     return 0;
   })();
@@ -101,7 +101,10 @@ export default function JobStatusPanel({
                 ) : (
                   <Icon size={14} className="shrink-0 text-muted" />
                 )}
-                <span className="truncate font-medium">{stage.label}</span>
+                <div className="flex flex-col min-w-0">
+                  <span className="truncate font-medium">{stage.label}</span>
+                  <span className="text-[10px] font-mono text-muted/80 truncate">{stage.engine}</span>
+                </div>
               </div>
             );
           })}

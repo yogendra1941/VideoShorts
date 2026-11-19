@@ -437,6 +437,32 @@ def get_history():
     return {"videos": videos}
 
 
+@app.delete("/api/history")
+def clear_history():
+    """Deletes all rendered clips and manifests from output."""
+    if config.OUTPUT_DIR.exists():
+        for f in config.OUTPUT_DIR.glob("*.*"):
+            try:
+                f.unlink()
+            except Exception:
+                pass
+    jobs.clear()
+    return {"status": "ok", "message": "All vault clips cleared"}
+
+
+@app.delete("/api/history/{filename}")
+def delete_history_clip(filename: str):
+    """Deletes a specific clip from output."""
+    clip_path = config.OUTPUT_DIR / filename
+    if clip_path.exists():
+        try:
+            clip_path.unlink()
+            return {"status": "ok", "deleted": filename}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    raise HTTPException(status_code=404, detail="Clip not found")
+
+
 @app.get("/api/projects")
 def get_projects():
     """Returns active projects list."""
