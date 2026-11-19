@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Activity, 
-  Terminal, 
-  ChevronDown, 
-  Loader2, 
-  CheckCircle2, 
+import {
+  Activity,
+  Terminal,
+  ChevronDown,
+  Loader2,
+  CheckCircle2,
   AlertCircle,
   Film,
   TrendingUp,
@@ -60,19 +60,18 @@ export default function JobStatusPanel({
       <div className="card p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold text-ink">
-            <Activity 
-              size={16} 
-              className={`text-accent ${status === 'processing' ? 'animate-pulse' : ''}`} 
+            <Activity
+              size={16}
+              className={`text-accent ${status === 'processing' ? 'animate-pulse' : ''}`}
             />
             <span>Pipeline Telemetry</span>
           </div>
-          <span className={`px-2 py-0.5 rounded text-[11px] font-mono font-semibold uppercase ${
-            status === 'processing'
+          <span className={`px-2 py-0.5 rounded text-[11px] font-mono font-semibold uppercase ${status === 'processing'
               ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
               : status === 'complete'
-              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-              : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
-          }`}>
+                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+            }`}>
             {status}
           </span>
         </div>
@@ -86,13 +85,12 @@ export default function JobStatusPanel({
             return (
               <div
                 key={stage.id}
-                className={`p-2 rounded-lg border flex items-center gap-2 text-xs transition-all ${
-                  isDone
+                className={`p-2 rounded-lg border flex items-center gap-2 text-xs transition-all ${isDone
                     ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
                     : isCurrent
-                    ? 'border-accent bg-accent/15 text-accent shadow-sm shadow-accent/10'
-                    : 'border-rule bg-paper3/30 text-muted'
-                }`}
+                      ? 'border-accent bg-accent/15 text-accent shadow-sm shadow-accent/10'
+                      : 'border-rule bg-paper3/30 text-muted'
+                  }`}
               >
                 {isDone ? (
                   <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
@@ -138,9 +136,6 @@ export default function JobStatusPanel({
           <ProcessingAnimation
             media={processingMedia}
             isComplete={status === 'complete'}
-            syncedTime={syncedTime}
-            isSyncedPlaying={isSyncedPlaying}
-            syncTrigger={syncTrigger}
           />
         </div>
       )}
@@ -161,14 +156,14 @@ export default function JobStatusPanel({
               </span>
             )}
           </div>
-          <ChevronDown 
-            size={16} 
-            className={`text-muted transition-transform duration-200 ${logsVisible ? '' : 'rotate-180'}`} 
+          <ChevronDown
+            size={16}
+            className={`text-muted transition-transform duration-200 ${logsVisible ? '' : 'rotate-180'}`}
           />
         </button>
 
         {logsVisible && (
-          <div 
+          <div
             ref={logContainerRef}
             className="flex-1 p-3.5 overflow-y-auto font-mono text-xs space-y-1.5 custom-scrollbar bg-paper/90 text-slate-300 leading-relaxed"
           >
@@ -184,13 +179,12 @@ export default function JobStatusPanel({
                       {timeStr}
                     </span>
                   )}
-                  <span className={`break-all ${
-                    isError 
-                      ? 'text-rose-400 font-semibold' 
-                      : isSuccess 
-                      ? 'text-emerald-400 font-medium' 
-                      : 'text-slate-300'
-                  }`}>
+                  <span className={`break-all ${isError
+                      ? 'text-rose-400 font-semibold'
+                      : isSuccess
+                        ? 'text-emerald-400 font-medium'
+                        : 'text-slate-300'
+                    }`}>
                     {log}
                   </span>
                 </div>
@@ -209,3 +203,4 @@ export default function JobStatusPanel({
     </div>
   );
 }
+syncedTime
