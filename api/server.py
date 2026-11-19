@@ -463,6 +463,41 @@ def delete_history_clip(filename: str):
     raise HTTPException(status_code=404, detail="Clip not found")
 
 
+@app.get("/api/latest-job")
+def get_latest_job():
+    """Returns the most recent job from memory or disk manifests."""
+    if jobs:
+        latest_id = list(jobs.keys())[-1]
+        job = jobs[latest_id]
+        status_mapped = "complete" if job.get("status") in ("completed", "complete") else ("error" if job.get("status") == "failed" else job.get("status", "idle"))
+        return {
+            **job,
+            "job_id": latest_id,
+            "status": status_mapped,
+            "clips": job.get("clips", []),
+            "results": {"clips": job.get("clips", [])},
+            "logs": job.get("logs", [job.get("step", "Processing...")]),
+        }
+    if config.OUTPUT_DIR.exists():
+        manifests = sorted(config.OUTPUT_DIR.glob("job_*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+        if manifests:
+            try:
+                with open(manifests[0], "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    jid = data.get("job_id", manifests[0].stem.replace("job_", ""))
+                    return {
+                        **data,
+                        "job_id": jid,
+                        "status": "complete",
+                        "clips": data.get("clips", []),
+                        "results": {"clips": data.get("clips", [])},
+                        "logs": ["Job complete: clips available in studio and vault."],
+                    }
+            except Exception as e:
+                logger.warning("Could not parse latest job manifest: %s", e)
+    return {"job_id": None, "status": "idle", "clips": [], "results": {"clips": []}}
+
+
 @app.get("/api/projects")
 def get_projects():
     """Returns active projects list."""

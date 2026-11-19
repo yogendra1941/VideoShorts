@@ -60,6 +60,28 @@ export default function App() {
       });
   }, [results]);
 
+  // Restore latest job on initial mount so clips are immediately visible
+  useEffect(() => {
+    let isMounted = true;
+    apiFetch('/api/latest-job')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!isMounted || !data || !data.job_id) return;
+        if (data.status === 'processing') {
+          setJobId(data.job_id);
+          setStatus('processing');
+          if (Array.isArray(data.logs)) setLogs(data.logs);
+        } else if (data.status === 'complete' && Array.isArray(data.clips) && data.clips.length > 0) {
+          setJobId(data.job_id);
+          setStatus('complete');
+          setResults({ clips: data.clips });
+          if (Array.isArray(data.logs)) setLogs(data.logs);
+        }
+      })
+      .catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
+
   // Handle job status polling
   useEffect(() => {
     if (status !== 'processing' || !jobId) return;
@@ -309,6 +331,20 @@ export default function App() {
             <div className="h-full overflow-y-auto custom-scrollbar p-6 max-w-5xl mx-auto">
               <HistoryTab
                 onReopenProject={async (id) => {
+                  try {
+                    const res = await apiFetch(`/api/jobs/${id}`);
+                    if (res.ok) {
+                      const data = await res.json();
+                      setJobId(id);
+                      setStatus(data.status || 'complete');
+                      setResults({ clips: data.clips || [] });
+                      if (Array.isArray(data.logs)) setLogs(data.logs);
+                      setActiveTab('dashboard');
+                      return;
+                    }
+                  } catch (e) {
+                    console.error("Failed to reopen project", e);
+                  }
                   setJobId(id);
                   setStatus('processing');
                   setActiveTab('dashboard');
