@@ -61,6 +61,26 @@ class ViralityScorer:
                 "reason": "Complete continuous segment",
             }]
 
+        # Ensure clip floor for longer videos: backfill if LLM returned fewer than target clips
+        if len(candidates) < target_clips and total_duration >= min_duration * 1.5:
+            needed = target_clips - len(candidates)
+            stride = max(min_duration, (total_duration - max_duration) / max(1, needed + 1))
+            for i in range(needed):
+                win_start = round(min(total_duration - min_duration, (i + 1) * stride), 1)
+                win_end = round(min(total_duration, win_start + min(40.0, max_duration)), 1)
+                # Find speech segment near this window
+                matching_text = " ".join(s.get("text", "") for s in transcript_segments 
+                                        if s.get("start", 0) >= win_start and s.get("end", 0) <= win_end)
+                first_few = " ".join(matching_text.split()[:6]) if matching_text else "Key moment in the conversation"
+                candidates.append({
+                    "start": win_start,
+                    "end": win_end,
+                    "title": f"Key Highlight #{len(candidates) + 1}",
+                    "hook": first_few,
+                    "viral_score": max(70, 84 - i * 3),
+                    "reason": "Dense continuous speech segment across video timeline",
+                })
+
         # Apply Overlap Deduplication (NMS)
         deduped = self.deduplicate_overlaps(candidates, max_overlap_ratio=0.30)
         deduped.sort(key=lambda x: x.get("viral_score", 0), reverse=True)

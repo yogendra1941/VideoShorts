@@ -24,7 +24,27 @@ class WhisperTranscriber:
         self._model = None
 
     def _load_model(self, force_cpu: bool = False):
-        """Loads faster-whisper model."""
+        """Loads faster-whisper model with NVIDIA CUDA DLL autodiscovery."""
+        import os
+        import sys
+
+        # Auto-register NVIDIA CUDA runtime DLLs (cublas, cudnn) if present in environment
+        try:
+            site_nvidia = Path(sys.executable).parent.parent / "Lib" / "site-packages" / "nvidia"
+            if site_nvidia.exists():
+                for bin_dir in site_nvidia.glob("*/bin"):
+                    if bin_dir.is_dir():
+                        bin_str = str(bin_dir.resolve())
+                        if bin_str not in os.environ.get("PATH", ""):
+                            os.environ["PATH"] = bin_str + os.pathsep + os.environ.get("PATH", "")
+                        if hasattr(os, "add_dll_directory"):
+                            try:
+                                os.add_dll_directory(bin_str)
+                            except Exception:
+                                pass
+        except Exception:
+            pass
+
         from faster_whisper import WhisperModel
 
         target_device = "cpu" if force_cpu else self.device
@@ -65,14 +85,16 @@ class WhisperTranscriber:
             raise
 
     def _run_transcription(self, model, audio_path: Path) -> Dict[str, Any]:
-        """Executes the transcription stream."""
+        """Executes the transcription stream with optimized beam search and VAD filtering."""
         logger.info("Transcribing audio: %s", audio_path.name)
 
+        beam = 1
         segments_iter, info = model.transcribe(
             str(audio_path),
-            beam_size=5,
+            beam_size=beam,
             word_timestamps=True,
-            vad_filter=False,  # Avoid aggressive VAD removal on short/demo audio
+            vad_filter=True,
+            vad_parameters=dict(min_silence_duration_ms=400),
         )
 
         segments: List[Dict[str, Any]] = []

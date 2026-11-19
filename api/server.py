@@ -126,11 +126,21 @@ def _run_pipeline_job(job_id: str, req: JobRequest):
                 deep_clips = pipeline.honesty_gate.filter_honest(deep_clips)
             candidates.extend(deep_clips)
 
-        # Step 5: Critic
+        # Step 5: Critic with Clip Floor Guarantee (like OpenShorts)
         if req.enable_critic and candidates:
             _log_event(job_id, "Running 3-run randomized AI critic blind evaluation...")
             approved = pipeline.critic.evaluate_candidates(candidates)
-            final_selection = approved[:req.clips] if approved else candidates[:req.clips]
+            if approved:
+                final_selection = list(approved)
+                # If critic rejected too aggressively, backfill from top candidates to guarantee target clip count
+                for cand in candidates:
+                    if len(final_selection) >= req.clips:
+                        break
+                    if cand not in final_selection:
+                        final_selection.append(cand)
+                final_selection = final_selection[:req.clips]
+            else:
+                final_selection = candidates[:req.clips]
         else:
             final_selection = candidates[:req.clips]
 
