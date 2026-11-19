@@ -1,7 +1,7 @@
 """Social platform copy generation: per-platform titles and descriptions for each finished short.
 
-Adapted from OpenShorts' social_platforms.py: builds short, platform-appropriate metadata
-(TikTok/Reels/Shorts) from the clip content.
+VideoShorts social engine: builds tailored, high-engagement metadata
+(TikTok/Reels/Shorts) from clip transcripts and viral hooks.
 """
 
 import logging

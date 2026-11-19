@@ -47,9 +47,12 @@ class Config:
     MAX_CLIP_DURATION: int = int(os.getenv("MAX_CLIP_DURATION", "60"))
     LOUDNORM_ENABLED: bool = os.getenv("LOUDNORM_ENABLED", "true").lower() in ("1", "true", "yes")
 
-    # Paths
+    # Paths & Binaries
     PROJECT_ROOT: Path = PROJECT_ROOT
     TEMP_DIR: Path = TEMP_DIR
     OUTPUT_DIR: Path = OUTPUT_DIR
+    FFMPEG_BIN: str = os.getenv("FFMPEG_BIN", "ffmpeg")
+    FFPROBE_BIN: str = os.getenv("FFPROBE_BIN", "ffprobe")
+    YTDLP_BIN: str = os.getenv("YTDLP_BIN", "yt-dlp")
 
 config = Config()

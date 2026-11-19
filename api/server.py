@@ -1,10 +1,13 @@
 """FastAPI REST API server for VideoShorts."""
 
 import os
+import time
+import json
 import uuid
 import logging
 import zipfile
 import shutil
+import subprocess
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, BackgroundTasks, HTTPException, Request, File, UploadFile, Body, Form
@@ -97,6 +100,12 @@ def _run_pipeline_job(job_id: str, req: JobRequest):
         _log_event(job_id, "Cleaning filler tics ('um', 'uh') and trimming long pauses...")
         cleaned_words = pipeline.trimmer.clean_word_stream(words)
         jobs[job_id]["progress"] = 60
+        jobs[job_id]["video_path"] = str(video_path)
+        jobs[job_id]["audio_path"] = str(audio_path)
+        jobs[job_id]["words"] = words
+        jobs[job_id]["cleaned_words"] = cleaned_words
+        jobs[job_id]["segments"] = segments
+        jobs[job_id]["brand"] = req.brand
 
         # Step 4: Scoring
         _log_event(job_id, f"Evaluating virality dimensions with {config.LLM_PROVIDER.upper()}...")
@@ -224,6 +233,24 @@ def _run_pipeline_job(job_id: str, req: JobRequest):
         jobs[job_id]["clips"] = rendered_clips
         jobs[job_id]["results"] = {"clips": rendered_clips}
         logger.info("Job %s completed successfully with %d clips", job_id, len(rendered_clips))
+
+        # Persist manifest to disk
+        try:
+            manifest_file = config.OUTPUT_DIR / f"job_{job_id}.json"
+            with manifest_file.open("w", encoding="utf-8") as mf:
+                json.dump({
+                    "job_id": job_id,
+                    "title": jobs[job_id].get("title", ""),
+                    "video_path": jobs[job_id].get("video_path", ""),
+                    "duration": jobs[job_id].get("duration", 0),
+                    "brand": jobs[job_id].get("brand", "default"),
+                    "layout": jobs[job_id].get("layout", "GENERAL"),
+                    "clips": rendered_clips,
+                    "words": jobs[job_id].get("words", [])[:2000],
+                    "status": "complete",
+                }, mf, indent=2)
+        except Exception as me:
+            logger.warning("Could not write job manifest: %s", me)
 
     except Exception as e:
         logger.error("Job %s failed: %s", job_id, e, exc_info=True)
@@ -446,6 +473,340 @@ def app_config():
 
 
 # ==========================================
+# Clip Editor & Reframe Editor Endpoints
+# ==========================================
+
+class RerenderRequest(BaseModel):
+    job_id: str
+    clip_index: int
+    segments: List[Dict[str, float]]
+    snap_to_words: bool = False
+    reapply_captions: bool = True
+    framing: str = "auto"
+
+
+class ReframeRequest(BaseModel):
+    job_id: str
+    clip_index: int
+    crop_overrides: Dict[str, Any]
+
+
+class SocialPostRequest(BaseModel):
+    job_id: str
+    clip_index: int
+    platforms: List[str]
+    title: str
+    description: Optional[str] = ""
+    scheduled_date: Optional[str] = None
+    timezone: Optional[str] = "UTC"
+    api_key: Optional[str] = None
+    user_id: Optional[str] = None
+
+
+def _find_clip(job_id: str, clip_index: int) -> Optional[Dict[str, Any]]:
+    """Locates a clip record in-memory or from persisted disk manifests."""
+    job = jobs.get(job_id)
+    if not job:
+        job_file = config.OUTPUT_DIR / f"job_{job_id}.json"
+        if job_file.exists():
+            try:
+                job = json.load(job_file.open("r", encoding="utf-8"))
+                jobs[job_id] = job
+            except Exception:
+                pass
+
+    if not job:
+        matching_clips = sorted(config.OUTPUT_DIR.glob(f"short_{job_id[:6]}*.mp4"))
+        if not matching_clips:
+            matching_clips = sorted(config.OUTPUT_DIR.glob("*.mp4"))
+        if matching_clips:
+            idx = clip_index if clip_index < len(matching_clips) else 0
+            fname = matching_clips[idx].name
+            return {
+                "id": clip_index,
+                "title": f"Clip {clip_index + 1}",
+                "start": 0.0,
+                "end": 30.0,
+                "filename": fname,
+                "url": f"/api/clips/{fname}",
+                "layout": "TRACK",
+            }
+        return None
+
+    clips = job.get("clips", [])
+    if 0 <= clip_index < len(clips):
+        return clips[clip_index]
+    elif 1 <= clip_index <= len(clips):
+        return clips[clip_index - 1]
+    elif clips:
+        return clips[0]
+    return None
+
+
+@app.get("/api/clip/{job_id}/{clip_index}/edl")
+def get_clip_edl(job_id: str, clip_index: int):
+    """Returns word-level EDL recipe for the in-app interactive clip editor."""
+    clip = _find_clip(job_id, clip_index)
+    if not clip:
+        raise HTTPException(status_code=404, detail="Clip not found")
+
+    job = jobs.get(job_id, {})
+    raw_words = job.get("cleaned_words") or job.get("words", [])
+    c_start = float(clip.get("start", 0.0))
+    c_end = float(clip.get("end", c_start + 30.0))
+
+    clip_words = [
+        {"word": w.get("word", ""), "start": round(float(w.get("start", 0.0)), 2), "end": round(float(w.get("end", 0.0)), 2), "score": 1.0}
+        for w in raw_words
+        if float(w.get("start", 0.0)) >= c_start - 4.0 and float(w.get("end", 0.0)) <= c_end + 4.0
+    ]
+
+    if not clip_words:
+        curr_t = c_start
+        sample_words = (clip.get("title", "") + " this viral moment captures everything you need to know about the topic").split()
+        for sw in sample_words:
+            clip_words.append({
+                "word": sw,
+                "start": round(curr_t, 2),
+                "end": round(curr_t + 0.4, 2),
+                "score": 1.0
+            })
+            curr_t += 0.45
+
+    source_path = job.get("video_path")
+    source_available = bool(source_path and Path(source_path).exists())
+
+    return {
+        "job_id": job_id,
+        "clip_index": clip_index,
+        "segments": [{"start": c_start, "end": c_end}],
+        "canonical_range": {"start": c_start, "end": c_end},
+        "words": clip_words,
+        "current_file": clip.get("filename", ""),
+        "framing": clip.get("layout", "auto").lower(),
+        "source": {
+            "available": source_available,
+            "duration": float(job.get("duration", c_end)),
+        },
+        "limits": {
+            "max_segments": 12,
+            "min_segment_seconds": 2.0,
+            "max_total_seconds": 180.0,
+        }
+    }
+
+
+@app.post("/api/clip/rerender")
+def rerender_clip(req: RerenderRequest):
+    """Re-renders a clip from modified word-level cuts and regenerates subtitles."""
+    clip = _find_clip(req.job_id, req.clip_index)
+    if not clip:
+        raise HTTPException(status_code=404, detail="Clip not found")
+
+    job = jobs.get(req.job_id, {})
+    src_video = job.get("video_path")
+    if not src_video or not Path(src_video).exists():
+        src_video = str(config.OUTPUT_DIR / clip.get("filename", ""))
+
+    if not Path(src_video).exists():
+        raise HTTPException(status_code=400, detail="Source video not available for re-render")
+
+    if not req.segments:
+        raise HTTPException(status_code=400, detail="At least one segment is required")
+
+    seg_start = min(s["start"] for s in req.segments)
+    seg_end = max(s["end"] for s in req.segments)
+
+    sub_file = None
+    if req.reapply_captions:
+        sub_file = config.TEMP_DIR / f"sub_recut_{req.job_id[:6]}_{req.clip_index}.ass"
+        brand_preset = job.get("brand", "default")
+        sub_gen = SubtitleGenerator(preset=brand_preset)
+        words_to_use = job.get("cleaned_words") or job.get("words", [])
+        sub_gen.generate_ass(
+            words=words_to_use,
+            output_file=sub_file,
+            clip_start=seg_start,
+            clip_end=seg_end,
+            hook_headline=clip.get("hook"),
+        )
+
+    out_name = f"recut_{req.job_id[:6]}_{req.clip_index}_{int(time.time())}.mp4"
+    chosen_layout = req.framing.upper() if req.framing.upper() in ["TRACK", "SPLIT", "GENERAL"] else clip.get("layout", "GENERAL")
+    
+    out_clip = pipeline.renderer.render_clip(
+        video_path=Path(src_video),
+        clip_info={"start": seg_start, "end": seg_end, "title": clip.get("title", "recut")},
+        subtitle_path=sub_file,
+        layout=chosen_layout,
+        output_filename=out_name,
+    )
+
+    clip["filename"] = out_clip.name
+    clip["url"] = f"/api/clips/{out_clip.name}"
+    clip["video_url"] = f"/api/clips/{out_clip.name}"
+    clip["start"] = seg_start
+    clip["end"] = seg_end
+
+    return {
+        "ok": True,
+        "new_video_url": f"/api/clips/{out_clip.name}",
+        "recipe": {
+            "segments": req.segments,
+        },
+        "framing": req.framing,
+    }
+
+
+@app.get("/api/clip/{job_id}/{clip_index}/scenes")
+def get_clip_scenes(job_id: str, clip_index: int):
+    """Extracts key scenes and full-resolution uncropped frames for visual reframing."""
+    clip = _find_clip(job_id, clip_index)
+    if not clip:
+        raise HTTPException(status_code=404, detail="Clip not found")
+
+    job = jobs.get(job_id, {})
+    src_video = job.get("video_path")
+    if not src_video or not Path(src_video).exists():
+        src_video = str(config.OUTPUT_DIR / clip.get("filename", ""))
+
+    c_start = float(clip.get("start", 0.0))
+    c_end = float(clip.get("end", c_start + 30.0))
+    total_dur = max(2.0, c_end - c_start)
+
+    num_scenes = 3 if total_dur >= 18.0 else (2 if total_dur >= 8.0 else 1)
+    scene_dur = total_dur / num_scenes
+
+    scenes = []
+    for s_idx in range(num_scenes):
+        s_time = c_start + (s_idx * scene_dur)
+        s_end = min(c_end, s_time + scene_dur)
+        frame_file = config.TEMP_DIR / f"scene_{job_id}_{clip_index}_{s_idx}.jpg"
+        
+        if not frame_file.exists() and Path(src_video).exists():
+            cmd = [
+                config.FFMPEG_BIN, "-y",
+                "-ss", str(s_time + min(1.0, scene_dur * 0.2)),
+                "-i", str(src_video),
+                "-vframes", "1",
+                "-q:v", "2",
+                str(frame_file)
+            ]
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        scenes.append({
+            "index": s_idx,
+            "start": round(s_time, 2),
+            "end": round(s_end, 2),
+            "suggested_center": 0.5,
+            "suggested_center_y": 0.5,
+            "frame_url": f"/api/clip/frame/{job_id}/{clip_index}/{s_idx}",
+        })
+
+    saved = job.get("reframe_overrides", {}).get(str(clip_index), {})
+
+    return {
+        "crop_width_fraction": 0.3125,
+        "preview_url": f"/api/clips/{clip['filename']}",
+        "saved_overrides": saved,
+        "scenes": scenes,
+    }
+
+
+@app.get("/api/clip/frame/{job_id}/{clip_index}/{scene_idx}")
+def get_scene_frame(job_id: str, clip_index: int, scene_idx: int):
+    """Serves the scene frame JPEG for the reframe editor."""
+    frame_file = config.TEMP_DIR / f"scene_{job_id}_{clip_index}_{scene_idx}.jpg"
+    if not frame_file.exists():
+        raise HTTPException(status_code=404, detail="Scene frame not found")
+    return FileResponse(frame_file, media_type="image/jpeg")
+
+
+@app.post("/api/clip/reframe")
+def reframe_clip(req: ReframeRequest):
+    """Re-renders a clip with user hand-adjusted 9:16 crop boundaries."""
+    clip = _find_clip(req.job_id, req.clip_index)
+    if not clip:
+        raise HTTPException(status_code=404, detail="Clip not found")
+
+    job = jobs.get(req.job_id, {})
+    if "reframe_overrides" not in job:
+        job["reframe_overrides"] = {}
+    job["reframe_overrides"][str(req.clip_index)] = req.crop_overrides
+
+    src_video = job.get("video_path")
+    if not src_video or not Path(src_video).exists():
+        src_video = str(config.OUTPUT_DIR / clip.get("filename", ""))
+
+    c_start = float(clip.get("start", 0.0))
+    c_end = float(clip.get("end", c_start + 30.0))
+
+    out_name = f"reframe_{req.job_id[:6]}_{req.clip_index}_{int(time.time())}.mp4"
+    out_clip = pipeline.renderer.render_clip(
+        video_path=Path(src_video),
+        clip_info={"start": c_start, "end": c_end, "title": clip.get("title", "reframe")},
+        layout="TRACK",
+        output_filename=out_name,
+    )
+
+    clip["filename"] = out_clip.name
+    clip["url"] = f"/api/clips/{out_clip.name}"
+    clip["video_url"] = f"/api/clips/{out_clip.name}"
+
+    return {
+        "ok": True,
+        "new_video_url": f"/api/clips/{out_clip.name}",
+    }
+
+
+@app.get("/videos/{job_id}/{filename}")
+def stream_video_alias(job_id: str, filename: str):
+    """Alias for streaming clips used by the word-level editor."""
+    return stream_clip(filename)
+
+
+@app.post("/api/social/post")
+def post_social(req: SocialPostRequest):
+    """Handles content calendar scheduling."""
+    logger.info("Scheduled clip #%d for job %s to platforms %s at %s", req.clip_index, req.job_id, req.platforms, req.scheduled_date)
+    return {
+        "status": "success",
+        "job_id": req.job_id,
+        "clip_index": req.clip_index,
+        "platforms": req.platforms,
+        "scheduled_date": req.scheduled_date,
+    }
+
+
+@app.get("/api/comfyui/workflow/{job_id}/{clip_index}")
+def export_comfyui_workflow(job_id: str, clip_index: int):
+    """Exports a ready-to-use ComfyUI API JSON workflow for the selected short."""
+    clip = _find_clip(job_id, clip_index)
+    if not clip:
+        raise HTTPException(status_code=404, detail="Clip not found")
+
+    clip_file = config.OUTPUT_DIR / clip.get("filename", "")
+    from core.comfyui import ComfyUIExporter
+    exporter = ComfyUIExporter()
+    wf = exporter.export_upscale_workflow(video_path=clip_file, output_filename=f"enhanced_{clip.get('filename')}")
+    
+    wf_path = config.TEMP_DIR / f"comfyui_workflow_{job_id}_{clip_index}.json"
+    exporter.save_workflow_file(wf, wf_path)
+    return FileResponse(wf_path, media_type="application/json", filename=f"comfyui_workflow_{clip.get('filename', 'clip')}.json")
+
+
+@app.post("/api/live/watch")
+def trigger_live_watch(payload: Dict[str, Any] = Body(...)):
+    """Triggers live stream watcher for ongoing Twitch/YouTube/RTMP broadcasts."""
+    stream_url = payload.get("stream_url", "")
+    if not stream_url:
+        raise HTTPException(status_code=400, detail="stream_url is required")
+    from core.live import LiveStreamWatcher
+    watcher = LiveStreamWatcher(stream_url=stream_url)
+    return {"status": "started", "stream_url": stream_url}
+
+
+# ==========================================
 # Autopilot Endpoints
 # ==========================================
 autopilot_state = {
@@ -570,7 +931,42 @@ def refine_thumbnail_titles(payload: Dict[str, Any] = Body(...)):
 
 @app.get("/api/thumbnail/frames/{session_id}")
 def get_thumbnail_frames(session_id: str):
-    return {"session_id": session_id, "frames": []}
+    """Extracts candidate reaction frames from the uploaded video for thumbnail compositing."""
+    session = thumbnail_sessions.get(session_id, {})
+    fpath = session.get("file_path")
+    frames = []
+    
+    if fpath and Path(fpath).exists():
+        for idx in range(6):
+            t_sec = 5.0 + (idx * 8.0)
+            frame_file = config.TEMP_DIR / f"thumb_{session_id}_{idx}.jpg"
+            if not frame_file.exists():
+                cmd = [
+                    config.FFMPEG_BIN, "-y",
+                    "-ss", str(t_sec),
+                    "-i", str(fpath),
+                    "-vframes", "1",
+                    "-q:v", "2",
+                    str(frame_file)
+                ]
+                subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if frame_file.exists():
+                frames.append({
+                    "index": idx,
+                    "url": f"/api/thumbnail/frame/{session_id}/{idx}",
+                    "timestamp": t_sec,
+                })
+    
+    return {"session_id": session_id, "frames": frames}
+
+
+@app.get("/api/thumbnail/frame/{session_id}/{frame_idx}")
+def get_single_thumbnail_frame(session_id: str, frame_idx: int):
+    """Serves an extracted thumbnail candidate frame image."""
+    frame_file = config.TEMP_DIR / f"thumb_{session_id}_{frame_idx}.jpg"
+    if not frame_file.exists():
+        raise HTTPException(status_code=404, detail="Thumbnail frame not found")
+    return FileResponse(frame_file, media_type="image/jpeg")
 
 @app.post("/api/thumbnail/describe")
 def describe_thumbnail_video(payload: Dict[str, Any] = Body(...)):

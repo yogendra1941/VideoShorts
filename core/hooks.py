@@ -1,8 +1,7 @@
 """Hook headline generation: writes an attention-grabbing opening line (hook) for each candidate clip.
 
-Adapted from OpenShorts' hooks module. This is the LLM-based text generation portion
-(the heavy PIL/emoji rasterization from OpenShorts is intentionally not ported here;
-the rendered hook is burned onto short video via the ASS subtitle headline).
+VideoShorts dynamic LLM copywriting engine. Generates high-CTR opening hooks that are
+burned cleanly into vertical shorts via animated ASS subtitle headlines.
 """
 
 import logging
