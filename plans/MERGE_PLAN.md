@@ -3,7 +3,7 @@
 **Goal:** Physically merge the useful code from all 5 reference repos into the standalone `VideoShorts` repo, adapt features to the unified architecture, and deliver a complete frontend + backend web studio with a proper product identity.
 
 **Source repos (read-only references):**
-- `reference_repos/openshorts` — layout reframing, dashboards, hooks, caption styles, editor
+- `reference_repos/studio_reference` — layout reframing, dashboards, hooks, caption styles, editor
 - `reference_repos/ClipKaro` — deep clips, critic, honesty, brand/music/sound modules
 - `reference_repos/claude-video-editor` — HyperFrames GSAP motion overlays, skill-based flow
 - `reference_repos/AI-Youtube-Shorts-Generator` — CLI, virality scoring, overlap dedup, output JSON
@@ -18,7 +18,7 @@
 ```
 VideoShorts/
 ├── core/                    # backend Python pipeline (unified)
-│   ├── ingest.py            # yt-dlp + ffmpeg + scene cuts (openshorts/ClipKaro adaptive scene detect)
+│   ├── ingest.py            # yt-dlp + ffmpeg + scene cuts (studio_reference/ClipKaro adaptive scene detect)
 │   ├── transcribe.py        # faster-whisper GPU + CPU fallback
 │   ├── trim.py              # filler/pause trimming
 │   ├── scoring.py           # virality framework + NMS dedup
@@ -28,13 +28,13 @@ VideoShorts/
 │   ├── reframer.py          # MediaPipe face tracking + EMA smoothing
 │   ├── subtitles.py         # ASS karaoke captions
 │   ├── renderer.py          # NVENC + loudnorm render
-│   ├── hooks.py             # [NEW] hook/title headline generation (openshorts hooks.py)
-│   ├── translate.py         # [NEW] translation backend (openshorts translate.py)
+│   ├── hooks.py             # [NEW] hook/title headline generation (studio_reference hooks.py)
+│   ├── translate.py         # [NEW] translation backend (studio_reference translate.py)
 │   ├── sound.py             # [NEW] audio analysis: laughter/applause/silence (ClipKaro sound.py)
 │   ├── honesty.py           # [NEW] deep-clip honesty gate (ClipKaro honesty.py)
 │   ├── music.py             # [NEW] background music ducking (ClipKaro music.py)
 │   ├── brand.py             # [NEW] brand kit styles (ClipKaro brand.py / brandkit.py)
-│   ├── social.py            # [NEW] social platform titles/descriptions (openshorts social_platforms.py)
+│   ├── social.py            # [NEW] social platform titles/descriptions (studio_reference social_platforms.py)
 │   ├── llm.py              # unified LLM client (Inception/Ollama/Gemini/OpenAI)
 │   └── __init__.py
 ├── api/
@@ -42,7 +42,7 @@ VideoShorts/
 ├── web/                     # React + Vite + Remotion frontend
 │   ├── src/
 │   │   ├── components/      # add: HookModal, TranslateModal, SubtitleModal, MusicModal,
-│   │   │                   #       BrandKitPanel, SocialPostCard (port from openshorts)
+│   │   │                   #       BrandKitPanel, SocialPostCard (port from studio_reference)
 │   │   ├── lib/             # port: api.js, jobPoll.js, renderInBrowser.js
 │   │   └── remotion/        # port: Subtitles.tsx, HookOverlay.tsx, VideoEffects.tsx
 │   └── package.json
@@ -64,18 +64,18 @@ VideoShorts/
 | Feature | Source | Target | Adaptation action |
 |---|---|---|---|
 | Adaptive scene-cut detection (dark footage fix) | ClipKaro `reframe.py` `scene_cuts()` | `core/ingest.py` | Replace scenedetect call with adaptive threshold logic |
-| Hook/title headline generation | OpenShorts `hooks.py`, `verify_hooks.py` | `core/hooks.py` | New module; add to pipeline before render |
-| Translation | OpenShorts `translate.py` | `core/translate.py` | Add `--translate <lang>` CLI + API param |
+| Hook/title headline generation | studio_reference `hooks.py`, `verify_hooks.py` | `core/hooks.py` | New module; add to pipeline before render |
+| Translation | studio_reference `translate.py` | `core/translate.py` | Add `--translate <lang>` CLI + API param |
 | Audio markers (laughter/applause/silence) | ClipKaro `sound.py` | `core/sound.py` | Feed into critic context + trim decisions |
 | Honesty gate (deep clips) | ClipKaro `honesty.py` | `core/honesty.py` | Wire inside `deep.py` composer |
 | Background music / ducking | ClipKaro `music.py` | `core/music.py` | Optional render stage (scene via config) |
 | Brand kit / style presets | ClipKaro `brand.py`, `brandkit.py` | `core/brand.py` | Config-driven subtitle/caption/overlay styles |
-| Social platform titles/descriptions | OpenShorts `social_platforms.py` | `core/social.py` | Generate per-platform copy at render |
-| Subtitle style presets | OpenShorts `captions.py`/`burned_subtitles.py` | `core/subtitles.py` | Extend with style presets |
+| Social platform titles/descriptions | studio_reference `social_platforms.py` | `core/social.py` | Generate per-platform copy at render |
+| Subtitle style presets | studio_reference `captions.py`/`burned_subtitles.py` | `core/subtitles.py` | Extend with style presets |
 | HyperFrames GSAP overlays | claude-video-editor `skills/hyperframes` | `motion/` | Port templates + alpha render script |
 | ComfyUI node bridge | ai-clipping-comfyui | `comfyui/` | Wrap `core/` pipeline as custom nodes (strip MuAPI) |
-| Web editor components | OpenShorts `dashboard/src/components` | `web/src/components` | Port HookModal, TranslateModal, SubtitleModal, BrandKitPanel, SocialPostCard |
-| Browser rendering | OpenShorts `lib/renderInBrowser.js` | `web/src/lib/` | Optional client-side render preview |
+| Web editor components | studio_reference `dashboard/src/components` | `web/src/components` | Port HookModal, TranslateModal, SubtitleModal, BrandKitPanel, SocialPostCard |
+| Browser rendering | studio_reference `lib/renderInBrowser.js` | `web/src/lib/` | Optional client-side render preview |
 
 ---
 

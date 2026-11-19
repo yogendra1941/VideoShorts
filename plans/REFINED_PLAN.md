@@ -1,7 +1,7 @@
 # VideoShorts: Production Engineering Blueprint
 
 ## 1. Architectural Foundation & Ground Truth
-This blueprint fuses the verified, production-grade mechanics of **ClipKaro** and **OpenShorts**, stripping out external third-party cloud lock-in (MuAPI) and establishing a resilient, 100% self-hosted or API-flexible engine optimized for consumer hardware (NVIDIA RTX 3050 4GB VRAM + CPU fallback).
+This blueprint fuses the verified, production-grade mechanics of **ClipKaro** and **Studio**, stripping out external third-party cloud lock-in (MuAPI) and establishing a resilient, 100% self-hosted or API-flexible engine optimized for consumer hardware (NVIDIA RTX 3050 4GB VRAM + CPU fallback).
 
 **Default LLM Provider**: **Inception Labs (`mercury-3`)** via `/v1/chat/completions` (with local Ollama `llama3.2`, Google Gemini, and OpenAI as interchangeable backends).
 
