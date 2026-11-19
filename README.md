@@ -10,15 +10,15 @@ Transform long videos, YouTube podcasts, and streams into viral 9:16 Shorts, Tik
 
 | Feature | Description | Reference / Origin |
 |---|---|---|
-| **Universal Ingest** | Fetch any public video link via `yt-dlp` or upload local MP4/MOV files | `OpenShorts` |
+| **Universal Ingest** | Fetch any public video link via `yt-dlp` or upload local MP4/MOV files | VideoShorts Ingest |
 | **GPU Acceleration** | `faster-whisper` CUDA with automatic int8 CPU fallback + `h264_nvenc` 1080x1920 encoder | NVIDIA RTX 3050 |
 | **4D Virality Framework** | Hook $\times 3$, Payoff $\times 3$, Emotion $\times 2$, Quotability $\times 1$ evaluation | Inception Mercury-3 / Ollama |
-| **Deep Clips Engine** | Topic Map $\rightarrow$ Thread Seeding $\rightarrow$ Multi-Scene Composition | `ClipKaro` deep engine |
-| **Honesty Gate** | Verifies transcript faithfulness, eliminating hallucinations and out-of-context quotes | `ClipKaro` honesty gate |
-| **3-Pass Statistical Critic** | Randomized blind evaluation filtering weak openings and rambling fluff | `OpenShorts` critic |
+| **Deep Clips Engine** | Topic Map $\rightarrow$ Thread Seeding $\rightarrow$ Multi-Scene Composition | Dynamic Thread Engine |
+| **Honesty Gate** | Verifies transcript faithfulness, eliminating hallucinations and out-of-context quotes | Context Guard |
+| **3-Pass Statistical Critic** | Randomized blind evaluation filtering weak openings and rambling fluff | AI Critic Pass |
 | **Smart 9:16 Reframing** | MediaPipe Face Tracking (`TRACK`), Dual-Speaker Stack (`SPLIT`), or Letterbox (`GENERAL`) | EMA Motion Smoothing |
 | **Bespoke Karaoke Styles** | 6 ASS subtitle presets (`Cyber Neon`, `Hormozi Gold`, `Podcast Split`, `Bold`, `Minimal`, `Default`) | Broadcast ASS Engine |
-| **Viral Hook Headlines** | Auto-generates punchy headline overlays for the first 3-5 seconds of every short | `OpenShorts` hooks |
+| **Viral Hook Headlines** | Auto-generates punchy headline overlays for the first 3-5 seconds of every short | VideoShorts Hooks |
 | **Social Copy Generator** | Generates tailored captions & hashtags for TikTok, Instagram Reels, and YouTube Shorts | Multi-Platform Engine |
 | **Security Hardening** | Strict SSRF guard blocking private IP/cloud metadata ranges + path traversal sanitizer | RFC 1918 / Link-Local Guard |
 | **100% Free & Unlimited** | Zero subscriptions, no watermark checks, no plan gates, runs completely self-hosted | Unlocked |
