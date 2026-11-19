@@ -7,7 +7,8 @@ import {
   Github, 
   Zap,
   Flame,
-  ShieldCheck
+  ShieldCheck,
+  Eye
 } from 'lucide-react';
 import { NAV_ITEMS } from './StudioSidebar';
 
@@ -44,6 +45,15 @@ export default function StudioHeader({ activeTab, onReset, status }) {
 
       {/* Telemetry & Badges */}
       <div className="flex items-center gap-3">
+        {/* Showcase Link */}
+        <a
+          href="#landing"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rule bg-paper3/40 hover:bg-paper3 text-xs font-medium text-ink transition-colors"
+        >
+          <Eye size={13} className="text-accent" />
+          <span>Showcase & Demos</span>
+        </a>
+
         {/* GPU Status */}
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 font-mono text-xs">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
