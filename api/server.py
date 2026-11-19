@@ -359,6 +359,14 @@ async def create_job(
 def get_job_status(job_id: str):
     """Returns status, logs, and clips of a job."""
     if job_id not in jobs:
+        manifest = config.OUTPUT_DIR / f"job_{job_id}.json"
+        if manifest.exists():
+            try:
+                with open(manifest, "r", encoding="utf-8") as f:
+                    jobs[job_id] = json.load(f)
+            except Exception as e:
+                logger.error("Failed loading job %s manifest: %s", job_id, e)
+    if job_id not in jobs:
         raise HTTPException(status_code=404, detail="Job not found")
     job = jobs[job_id]
     status_mapped = "complete" if job["status"] in ("completed", "complete") else ("error" if job["status"] == "failed" else job["status"])
