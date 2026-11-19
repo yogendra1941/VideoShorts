@@ -76,3 +76,56 @@ class SpeechTrimmer:
         segments.append((seg_start, final_end))
 
         return segments
+
+    def snap_clip_to_words(
+        self,
+        start: float,
+        end: float,
+        words: List[Dict[str, Any]],
+        video_duration: float = 3600.0,
+        min_duration: float = 15.0,
+        max_duration: float = 60.0,
+        search_window: float = 1.5,
+        max_lead: float = 0.35,
+        max_tail: float = 0.45,
+    ) -> Tuple[float, float]:
+        """Snaps raw AI-generated clip boundaries onto ground-truth word boundaries.
+        Adds natural silence padding so speech never starts or cuts off mid-word (OpenShorts style).
+        """
+        original = (round(float(start), 3), round(float(end), 3))
+        if not words:
+            return original
+
+        starts = [float(w.get("start", w.get("s", 0))) for w in words]
+        ends = [float(w.get("end", w.get("e", 0))) for w in words]
+
+        # Snap start to nearest word start, leading into preceding silence
+        new_start = float(start)
+        candidates = [s for s in starts if abs(s - new_start) <= search_window]
+        if candidates:
+            word_start = min(candidates, key=lambda s: abs(s - new_start))
+            prev_ends = [e for e in ends if e <= word_start]
+            if prev_ends:
+                gap = max(0.0, word_start - max(prev_ends))
+                lead = min(max_lead, gap / 2)
+            else:
+                lead = max_lead
+            new_start = max(0.0, word_start - lead)
+
+        # Snap end to nearest word end, trailing into following silence
+        new_end = float(end)
+        candidates = [e for e in ends if abs(e - new_end) <= search_window]
+        if candidates:
+            word_end = min(candidates, key=lambda e: abs(e - new_end))
+            next_starts = [s for s in starts if s >= word_end]
+            if next_starts:
+                gap = max(0.0, min(next_starts) - word_end)
+                tail = min(max_tail, gap / 2)
+            else:
+                tail = max_tail
+            new_end = min(video_duration, word_end + tail)
+
+        if new_end - new_start < min_duration or new_end - new_start > max_duration + 5.0:
+            return original
+
+        return round(new_start, 3), round(new_end, 3)

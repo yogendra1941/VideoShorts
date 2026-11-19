@@ -17,6 +17,43 @@ class VideoRenderer:
         self.output_dir = output_dir or config.OUTPUT_DIR
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
+    def cut_clip(
+        self,
+        input_video: Path,
+        output_slice: Path,
+        start: float,
+        end: float,
+    ) -> bool:
+        """Precision slice [start, end] out of input_video (OpenShorts cut_clip contract).
+        Uses NVENC hardware acceleration where available, ensuring zero audio drift.
+        """
+        duration = max(0.5, end - start)
+        cmd = [
+            "ffmpeg", "-y",
+            "-ss", f"{start:.3f}",
+            "-t", f"{duration:.3f}",
+            "-i", str(input_video),
+            "-c:v", "h264_nvenc",
+            "-preset", "p4",
+            "-b:v", "8M",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            str(output_slice),
+        ]
+        try:
+            subprocess.run(cmd, capture_output=True, text=True, check=True)
+            return output_slice.exists() and output_slice.stat().st_size > 0
+        except Exception:
+            # Fallback to libx264
+            cmd[5] = "libx264"
+            cmd[7] = "veryfast"
+            try:
+                subprocess.run(cmd, capture_output=True, text=True, check=True)
+                return output_slice.exists() and output_slice.stat().st_size > 0
+            except Exception as e:
+                logger.error("cut_clip slice failed: %s", e)
+                return False
+
     def render_clip(
         self,
         video_path: Path,

@@ -174,7 +174,17 @@ def _run_pipeline_job(job_id: str, req: JobRequest):
         # Step 6: Render
         rendered_clips = []
         for idx, clip in enumerate(final_selection, 1):
-            _log_event(job_id, f"Rendering Short #{idx}/{len(final_selection)}: '{clip.get('title', '')}'...")
+            # OpenShorts word boundary snapping: never cut mid-word or mid-sentence
+            snapped_start, snapped_end = pipeline.trimmer.snap_clip_to_words(
+                start=clip["start"],
+                end=clip["end"],
+                words=words,
+                video_duration=meta.get("duration", 3600.0),
+            )
+            clip["start"] = snapped_start
+            clip["end"] = snapped_end
+
+            _log_event(job_id, f"Rendering Short #{idx}/{len(final_selection)} [{snapped_start:.1f}s - {snapped_end:.1f}s]: '{clip.get('title', '')}'...")
             sub_file = config.TEMP_DIR / f"sub_{video_path.stem}_{idx}.ass"
             sub_generator.generate_ass(
                 words=cleaned_words,

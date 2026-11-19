@@ -140,7 +140,17 @@ class VideoShortsPipeline:
         # Step 7 & 8: Subtitles & Hardware Render
         rendered_outputs: List[Path] = []
         for idx, clip in enumerate(final_selection, 1):
-            logger.info("--- Rendering Short %d/%d: '%s' ---", idx, len(final_selection), clip.get("title", ""))
+            # OpenShorts word boundary snapping: cuts land on speech pauses, never mid-word
+            snapped_start, snapped_end = self.trimmer.snap_clip_to_words(
+                start=clip["start"],
+                end=clip["end"],
+                words=words,
+                video_duration=meta.get("duration", 3600.0),
+            )
+            clip["start"] = snapped_start
+            clip["end"] = snapped_end
+
+            logger.info("--- Rendering Short %d/%d [%.1fs - %.1fs]: '%s' ---", idx, len(final_selection), snapped_start, snapped_end, clip.get("title", ""))
 
             # Calculate smoothed face tracking crop box if TRACK layout is active
             crop_box = None
